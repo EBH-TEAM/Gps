@@ -28,7 +28,7 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 12px 8px 12px;
+            padding: 6px 10px 8px 10px;
             background: radial-gradient(circle at 50% 30%, #0c1622, #04080c 80%);
         }
 
@@ -38,7 +38,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 0 2px;
-            height: 28px;
+            height: 26px;
             flex-shrink: 0;
         }
 
@@ -65,6 +65,7 @@
             height: 7px;
             background-color: #ff3366;
             border-radius: 50%;
+            flex-shrink: 0;
         }
 
         .gps-dot.active {
@@ -72,7 +73,7 @@
             box-shadow: 0 0 10px #00e5cc;
         }
 
-        /* Gauge area – more compact, no extra space */
+        /* Gauge area – takes remaining space, no extra padding */
         .gauge-area {
             position: relative;
             width: 100%;
@@ -81,7 +82,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 0; /* allow shrink */
+            min-height: 0;
             margin: 0;
             padding: 0;
         }
@@ -102,23 +103,23 @@
             filter: drop-shadow(0 0 8px #00e5cc);
         }
 
-        /* Digital display – repositioned slightly lower & centered */
+        /* Digital display – positioned inside gauge, closer to bottom */
         .digital-display {
             position: absolute;
-            bottom: 8%;
+            bottom: 6%;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
             pointer-events: none;
+            line-height: 1;
         }
 
         .speed-number {
-            font-size: 64px;
+            font-size: 62px;
             font-weight: 800;
             color: #00e5cc;
-            line-height: 0.8;
             text-shadow: 0 0 20px rgba(0, 229, 204, 0.4);
             letter-spacing: -1px;
         }
@@ -127,11 +128,11 @@
             font-size: 10px;
             color: #5b6e82;
             letter-spacing: 3px;
-            margin-top: 2px;
+            margin-top: 0px;
             font-weight: 700;
         }
 
-        /* Bottom section – tighter, lifted up */
+        /* Bottom section – compact, always visible */
         .bottom-section {
             width: 100%;
             max-width: 400px;
@@ -198,6 +199,7 @@
             cursor: pointer;
             text-transform: uppercase;
             transition: all 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-start {
@@ -223,26 +225,37 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        /* small screens fine-tune */
+        /* Fine-tune for smaller screens – buttons always visible */
         @media (max-height: 700px) {
-            .top-bar { height: 24px; }
+            .top-bar { height: 22px; }
             .brand-name { font-size: 11px; }
             .gps-status { font-size: 9px; }
-            .digital-display { bottom: 6%; }
-            .speed-number { font-size: 52px; }
+            .digital-display { bottom: 4%; }
+            .speed-number { font-size: 50px; }
             .stat-value { font-size: 14px; }
             .btn { padding: 10px 6px; font-size: 11px; }
             .stats-panel { padding: 4px 2px; }
         }
 
         @media (max-height: 640px) {
-            .digital-display { bottom: 4%; }
-            .speed-number { font-size: 44px; }
+            .digital-display { bottom: 2%; }
+            .speed-number { font-size: 42px; }
             .stat-value { font-size: 13px; }
             .btn { padding: 8px 4px; font-size: 10px; }
-            .stats-panel { padding: 3px 2px; gap: 0px; }
+            .stats-panel { padding: 3px 2px; }
             .stat-label { font-size: 8px; }
             .bottom-section { gap: 4px; }
+        }
+
+        /* Very short screens */
+        @media (max-height: 580px) {
+            .speed-number { font-size: 36px; }
+            .stat-value { font-size: 12px; }
+            .btn { padding: 6px 4px; font-size: 9px; }
+            .stats-panel { padding: 2px 2px; }
+            .stat-label { font-size: 7px; }
+            .bottom-section { gap: 3px; }
+            .digital-display { bottom: 1%; }
         }
     </style>
 </head>
