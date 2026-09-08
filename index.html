@@ -504,9 +504,7 @@
         <div class="circle-card speed-card">
             <div class="inner-bg"></div>
             <div class="content">
-                <div class="anim-container" id="animBox">
-                    <!-- SVG Walker Animation Placeholder -->
-                </div>
+                <div class="anim-container" id="animBox"></div>
                 <div class="label">স্পিড</div>
                 <div class="value" id="speedDisplay">0.0 <span class="unit">km/h</span></div>
             </div>
@@ -562,7 +560,6 @@
             }
             createParticles();
 
-            // ভেক্টর অ্যানিমেশন টেমপ্লেট
             const walkerSVG = `
                 <svg class="walker-svg" viewBox="0 0 50 50">
                     <circle cx="25" cy="10" r="4" fill="#33ff66" stroke="none" />
@@ -589,11 +586,25 @@
             let watchId = null;
             let isTracking = false;
             let smoothedSpeed = 0;
-            const SMOOTHING_FACTOR = 0.25;
+            const SMOOTHING_FACTOR = 0.2; // গুগল ম্যাপ গ্র্যাজুয়াল ফিল্টারিং
 
-            // লোকাল স্টোরেজ থেকে পূর্বে সেভ হওয়া দূরত্ব লোড করা
+            // ডিভাইস মোশন ভেরিয়েবল
+            let isMovingPhysical = false;
+            let motionThreshold = 1.2; // ডিভাইসের ফিজিক্যাল মুভমেন্ট চেক
+
             let totalDistance = parseFloat(localStorage.getItem('speed_tracker_distance')) || 0;
             distanceEl.innerHTML = `${totalDistance.toFixed(2)} <span class="unit">km</span>`;
+
+            // ফিজিক্যাল সেন্সর চেক (ফোন স্থির থাকলে GPS স্পেকিউলেশন ট্র্যাশ করবে)
+            if (window.DeviceMotionEvent) {
+                window.addEventListener('devicemotion', function(event) {
+                    const acc = event.acceleration;
+                    if (acc && acc.x !== null) {
+                        const totalAcc = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+                        isMovingPhysical = totalAcc > motionThreshold;
+                    }
+                }, true);
+            }
 
             function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
                 const R = 6371000;
@@ -607,13 +618,16 @@
             }
 
             function updateUI(targetSpeed, distanceKm) {
+                // গুগল ম্যাপের মতো স্মুথ স্পিড রাইজ এবং ড্রপ
                 smoothedSpeed = smoothedSpeed + (targetSpeed - smoothedSpeed) * SMOOTHING_FACTOR;
-                if (smoothedSpeed < 0.3) smoothedSpeed = 0;
+                
+                // ০.৮ এর কম হলে স্পিড ০ করে দেবে (স্থির ফিল্টার)
+                if (smoothedSpeed < 0.8) smoothedSpeed = 0;
 
                 speedEl.innerHTML = `${smoothedSpeed.toFixed(1)} <span class="unit">km/h</span>`;
                 distanceEl.innerHTML = `${distanceKm.toFixed(2)} <span class="unit">km</span>`;
 
-                if (smoothedSpeed <= 0.3) {
+                if (smoothedSpeed <= 0.8) {
                     animBox.className = 'anim-container';
                     animBox.innerHTML = walkerSVG;
                 } else if (smoothedSpeed <= 6.0) {
@@ -631,8 +645,9 @@
                 const accuracy = position.coords.accuracy;
                 const currentTime = position.timestamp;
 
-                if (accuracy > 25) {
-                    statusText.textContent = '⚠️ সিগন্যাল খোঁজা হচ্ছে...';
+                // দুর্বল সিগন্যাল বাদ
+                if (accuracy > 20) {
+                    statusText.textContent = '⚠️ দুর্বল GPS সিগন্যাল...';
                     statusText.className = 'status-text error';
                     updateUI(0, totalDistance);
                     return;
@@ -657,14 +672,13 @@
                     instantSpeed = (distM / timeS) * 3.6;
                 }
 
-                if (distM < 1.5 && instantSpeed < 1.0) {
+                // জিপিএস ড্রিপ্ট ফিল্টার: যদি ফোন শারীরিকভাবে না নড়ে অথবা খুব কম জিপিএস শিফট হয়
+                if (distM < 2.5 || instantSpeed < 1.2 || (!isMovingPhysical && instantSpeed < 3.0)) {
                     instantSpeed = 0;
                 }
 
-                if (instantSpeed > 0.4) {
+                if (instantSpeed > 1.2) {
                     totalDistance += (distM / 1000);
-                    
-                    // লোকাল স্টোরেজে দূরত্ব সেভ করা হচ্ছে
                     localStorage.setItem('speed_tracker_distance', totalDistance.toString());
 
                     lastLat = lat;
@@ -672,7 +686,7 @@
                     lastTime = currentTime;
 
                     if (instantSpeed <= 6.0) {
-                        statusText.textContent = '🚶‍♂️ হাঁটা শনাক্ত হয়েছে';
+                        statusText.textContent = '🚶‍♂️ হাঁটা শুরু হয়েছে';
                     } else {
                         statusText.textContent = '🚗 গাড়ি রানিং রয়েছে';
                     }
@@ -707,7 +721,7 @@
                     handleError,
                     {
                         enableHighAccuracy: true,
-                        maximumAge: 1000,
+                        maximumAge: 0,
                         timeout: 5000
                     }
                 );
@@ -740,10 +754,7 @@
                 lastLon = null;
                 lastTime = null;
                 smoothedSpeed = 0;
-                
-                // লোকাল স্টোরেজের সেভ ডাটা রিফ্রেশ/রিসেট করা
                 localStorage.removeItem('speed_tracker_distance');
-
                 updateUI(0, 0);
                 statusText.textContent = '🔄 রিসেট সম্পন্ন হয়েছে';
                 statusText.className = 'status-text';
