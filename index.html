@@ -2,7 +2,7 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>স্পিড ও দূরত্ব ট্র্যাকার</title>
     <style>
         * {
@@ -14,220 +14,630 @@
 
         body {
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(145deg, #0b1120, #1a2639);
-            padding: 20px;
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        /* গ্লাসমরফিজম কার্ড */
-        .glass-card {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 60px 60px 40px 40px;
-            padding: 25px 20px 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            transition: transform 0.3s ease;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-5px);
-        }
-
-        /* বৃত্তাকার মিটারের জন্য র‍্যাপার */
-        .circle-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin: 10px 0 5px;
-        }
-
-        /* প্রতিটি বৃত্তাকার কার্ড */
-        .circle-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.5));
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 -3px 8px rgba(0, 0, 0, 0.4), inset 0 3px 8px rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            transition: all 0.3s ease;
+            background: #070b12;
+            padding: 10px;
+            overflow: hidden;
             position: relative;
         }
 
-        /* স্পিড কার্ডের বিশেষ গ্রেডিয়েন্ট বর্ডার ইফেক্ট */
-        .circle-card.speed-card {
-            background: radial-gradient(circle at 30% 30%, #2b3c5e, #141e30);
-            border: 2px solid rgba(0, 200, 255, 0.3);
-            box-shadow: 0 0 25px rgba(0, 150, 255, 0.2), inset 0 -3px 8px rgba(0, 0, 0, 0.6);
+        /* পটভূমিতে ডায়নামিক আরজিবি ইফেক্ট */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255,0,102,0.05), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0,102,255,0.05), transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255,204,0,0.03), transparent 70%);
+            animation: bgPulse 8s ease-in-out infinite alternate;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .circle-card.distance-card {
-            background: radial-gradient(circle at 30% 30%, #2a4b3c, #0f261b);
-            border: 2px solid rgba(0, 255, 180, 0.25);
-            box-shadow: 0 0 25px rgba(0, 255, 150, 0.15), inset 0 -3px 8px rgba(0, 0, 0, 0.6);
+        @keyframes bgPulse {
+            0% { transform: scale(1) rotate(0deg); opacity: 0.5; }
+            100% { transform: scale(1.2) rotate(5deg); opacity: 1; }
         }
 
-        .circle-card .label {
+        .container {
+            width: 100%;
+            max-width: 420px;
+            min-height: 95vh;
+            min-height: 95dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 10px 12px;
+            position: relative;
+            z-index: 1;
+            gap: 8px;
+        }
+
+        /* ====== উপরের স্পিড কার্ড ====== */
+        .speed-circle {
+            width: 100%;
+            max-width: 340px;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle at 30% 30%, #141e33, #080e1a);
+            transition: transform 0.3s ease;
+            margin-top: 5px;
+        }
+
+        /* আরজিবি রানিং বর্ডার - স্পিড */
+        .speed-circle::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: conic-gradient(from var(--angle, 0deg), 
+                #ff0066, #ff3300, #ffcc00, #33ff66, #00ccff, #9933ff, #ff0066);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: rgbRunning 2s linear infinite;
+            filter: blur(3px);
+            opacity: 0.7;
+        }
+
+        .speed-circle::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            background: conic-gradient(from var(--angle, 0deg), 
+                #ff0066, #ff3300, #ffcc00, #33ff66, #00ccff, #9933ff, #ff0066);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: rgbRunning 2s linear infinite;
+            filter: blur(8px);
+            opacity: 0.3;
+        }
+
+        .speed-circle .inner-bg {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #141e33, #080e1a);
+            z-index: 0;
+        }
+
+        @property --angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        @keyframes rgbRunning {
+            0% { --angle: 0deg; background-position: 0% 50%; }
+            100% { --angle: 360deg; background-position: 100% 50%; }
+        }
+
+        .speed-circle .content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .speed-circle .icon {
+            font-size: 38px;
+            margin-bottom: 2px;
+            filter: drop-shadow(0 0 25px rgba(0, 180, 255, 0.2));
+        }
+
+        .speed-circle .label {
             font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.35);
             text-transform: uppercase;
             margin-bottom: 4px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
-        .circle-card .value {
-            font-size: 32px;
+        .speed-circle .value {
+            font-size: 58px;
             font-weight: 700;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-            line-height: 1.2;
+            background: linear-gradient(135deg, #6dd5ff, #3a9bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             display: flex;
             align-items: baseline;
-            gap: 3px;
+            gap: 4px;
+            line-height: 1;
+            text-shadow: 0 0 60px rgba(0, 180, 255, 0.1);
         }
 
-        .circle-card .unit {
-            font-size: 14px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.6);
-            margin-left: 2px;
-        }
-
-        /* স্পিড কার্ডের রঙিন নম্বর */
-        .speed-card .value {
-            color: #6dd5ff;
-            text-shadow: 0 0 30px rgba(0, 180, 255, 0.4);
-        }
-
-        .distance-card .value {
-            color: #7dffb3;
-            text-shadow: 0 0 30px rgba(0, 255, 150, 0.3);
-        }
-
-        /* বাটন স্টাইল */
-        .btn-track {
-            width: 100%;
-            padding: 18px 10px;
+        .speed-circle .unit {
             font-size: 20px;
+            font-weight: 400;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ====== নিচের দূরত্ব কার্ড ====== */
+        .distance-circle {
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle at 30% 30%, #1a2e22, #0a1410);
+            transition: transform 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+        /* আরজিবি রানিং বর্ডার - দূরত্ব (উল্টো দিকে) */
+        .distance-circle::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: conic-gradient(from var(--angle2, 180deg), 
+                #9933ff, #0066ff, #00ccff, #33ff66, #ffcc00, #ff3300, #ff0066, #9933ff);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: rgbRunning2 2.5s linear infinite;
+            filter: blur(3px);
+            opacity: 0.6;
+        }
+
+        .distance-circle::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            background: conic-gradient(from var(--angle2, 180deg), 
+                #9933ff, #0066ff, #00ccff, #33ff66, #ffcc00, #ff3300, #ff0066, #9933ff);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: rgbRunning2 2.5s linear infinite;
+            filter: blur(8px);
+            opacity: 0.25;
+        }
+
+        .distance-circle .inner-bg {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #1a2e22, #0a1410);
+            z-index: 0;
+        }
+
+        @property --angle2 {
+            syntax: '<angle>';
+            initial-value: 180deg;
+            inherits: false;
+        }
+
+        @keyframes rgbRunning2 {
+            0% { --angle2: 180deg; background-position: 0% 50%; }
+            100% { --angle2: 540deg; background-position: 100% 50%; }
+        }
+
+        .distance-circle .content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .distance-circle .icon {
+            font-size: 34px;
+            margin-bottom: 2px;
+            filter: drop-shadow(0 0 25px rgba(0, 255, 150, 0.15));
+        }
+
+        .distance-circle .label {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .distance-circle .value {
+            font-size: 50px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #7dffb3, #3dcc7a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            line-height: 1;
+            text-shadow: 0 0 60px rgba(0, 255, 150, 0.08);
+        }
+
+        .distance-circle .unit {
+            font-size: 18px;
+            font-weight: 400;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ====== স্ট্যাটাস এলাকা ====== */
+        .status-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 0;
+            width: 100%;
+        }
+
+        .status-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 1.5px;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .status-text.active {
+            color: rgba(100, 255, 180, 0.5);
+        }
+
+        .status-text.error {
+            color: rgba(255, 150, 150, 0.5);
+        }
+
+        /* আরজিবি ডটস - মোবাইল চার্জারের মতো */
+        .rgb-dots {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
+        .rgb-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            animation: dotCharge 1.6s ease-in-out infinite;
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        .rgb-dots span:nth-child(1) { 
+            background: #ff0066; 
+            color: #ff0066;
+            animation-delay: 0s; 
+        }
+        .rgb-dots span:nth-child(2) { 
+            background: #ffcc00; 
+            color: #ffcc00;
+            animation-delay: 0.25s; 
+        }
+        .rgb-dots span:nth-child(3) { 
+            background: #33ff66; 
+            color: #33ff66;
+            animation-delay: 0.5s; 
+        }
+        .rgb-dots span:nth-child(4) { 
+            background: #0066ff; 
+            color: #0066ff;
+            animation-delay: 0.75s; 
+        }
+        .rgb-dots span:nth-child(5) { 
+            background: #9933ff; 
+            color: #9933ff;
+            animation-delay: 1s; 
+        }
+
+        @keyframes dotCharge {
+            0%, 100% { 
+                transform: scale(0.5); 
+                opacity: 0.15;
+                box-shadow: 0 0 5px currentColor;
+            }
+            50% { 
+                transform: scale(1.8); 
+                opacity: 1;
+                box-shadow: 0 0 25px currentColor, 0 0 50px currentColor;
+            }
+        }
+
+        /* ====== বাটন এলাকা ====== */
+        .button-area {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 340px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2px;
+        }
+
+        .btn-track {
+            padding: 12px 30px;
+            font-size: 13px;
             font-weight: 600;
             background: linear-gradient(135deg, #00b4db, #0083b0);
             border: none;
-            border-radius: 60px;
+            border-radius: 50px;
             color: white;
             cursor: pointer;
-            letter-spacing: 1.5px;
-            box-shadow: 0 12px 30px rgba(0, 150, 255, 0.25);
-            transition: all 0.25s ease;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            letter-spacing: 2px;
+            box-shadow: 0 8px 30px rgba(0, 150, 255, 0.12);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             text-transform: uppercase;
-            margin-top: 10px;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-track::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 52px;
+            background: conic-gradient(from 0deg, 
+                #ff0066, #ff3300, #ffcc00, #33ff66, #00ccff, #9933ff, #ff0066);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: rgbRunning 2s linear infinite;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            filter: blur(6px);
+        }
+
+        .btn-track:hover::before {
+            opacity: 0.5;
         }
 
         .btn-track:hover {
-            transform: scale(1.02);
-            box-shadow: 0 15px 40px rgba(0, 150, 255, 0.4);
-            background: linear-gradient(135deg, #00c6ff, #0072b0);
+            transform: scale(1.03);
+            box-shadow: 0 10px 40px rgba(0, 150, 255, 0.2);
         }
 
         .btn-track:active {
-            transform: scale(0.97);
+            transform: scale(0.95);
         }
 
-        /* ছোট ডিভাইসের জন্য রেসপন্সিভ */
-        @media (max-width: 450px) {
-            .circle-card {
-                width: 120px;
-                height: 120px;
+        .btn-track.stop {
+            background: linear-gradient(135deg, #f09819, #d35400);
+            box-shadow: 0 8px 30px rgba(255, 150, 0, 0.15);
+        }
+
+        /* রিসেট বাটন */
+        .btn-reset {
+            padding: 12px 18px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50px;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 50, 50, 0.15);
+            border-color: rgba(255, 50, 50, 0.3);
+            color: #ff6b6b;
+            transform: scale(1.05);
+        }
+
+        .btn-reset:active {
+            transform: scale(0.9);
+        }
+
+        /* ====== রেসপন্সিভ ====== */
+        @media (max-width: 420px) {
+            .speed-circle {
+                max-width: 280px;
             }
-            .circle-card .value {
+            .distance-circle {
+                max-width: 240px;
+            }
+            .speed-circle .value {
+                font-size: 44px;
+            }
+            .speed-circle .unit {
+                font-size: 16px;
+            }
+            .distance-circle .value {
+                font-size: 38px;
+            }
+            .distance-circle .unit {
+                font-size: 14px;
+            }
+            .speed-circle .icon {
+                font-size: 30px;
+            }
+            .distance-circle .icon {
                 font-size: 26px;
             }
-            .circle-card .label {
+            .btn-track {
+                padding: 10px 20px;
                 font-size: 11px;
             }
-            .btn-track {
-                font-size: 17px;
-                padding: 16px;
+            .btn-reset {
+                padding: 10px 14px;
+                font-size: 14px;
+                min-width: 42px;
             }
         }
 
         @media (max-width: 360px) {
-            .circle-card {
-                width: 100px;
-                height: 100px;
+            .speed-circle {
+                max-width: 220px;
             }
-            .circle-card .value {
-                font-size: 22px;
+            .distance-circle {
+                max-width: 190px;
+            }
+            .speed-circle .value {
+                font-size: 34px;
+            }
+            .speed-circle .unit {
+                font-size: 13px;
+            }
+            .distance-circle .value {
+                font-size: 30px;
+            }
+            .distance-circle .unit {
+                font-size: 12px;
+            }
+            .speed-circle .icon {
+                font-size: 24px;
+            }
+            .distance-circle .icon {
+                font-size: 20px;
+            }
+            .speed-circle .label,
+            .distance-circle .label {
+                font-size: 10px;
+                letter-spacing: 2px;
+            }
+            .btn-track {
+                padding: 8px 16px;
+                font-size: 10px;
+                letter-spacing: 1px;
+            }
+            .btn-reset {
+                padding: 8px 12px;
+                font-size: 12px;
+                min-width: 36px;
+            }
+            .status-text {
+                font-size: 10px;
+            }
+            .rgb-dots span {
+                width: 6px;
+                height: 6px;
+                gap: 8px;
             }
         }
 
-        /* ড্যাশবোর্ডের নিচে ছোট স্ট্যাটাস টেক্সট */
-        .status-text {
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 12px;
-            letter-spacing: 1px;
-            margin-top: 8px;
-            text-align: center;
-        }
-
-        /* অ্যানিমেশন: লোডিং এরর জন্য নরম পালস */
-        @keyframes pulseGlow {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-        .circle-card .value.pulse {
-            animation: pulseGlow 1.8s infinite ease-in-out;
+        @media (max-height: 700px) {
+            .speed-circle {
+                max-width: 220px;
+            }
+            .distance-circle {
+                max-width: 190px;
+            }
+            .speed-circle .value {
+                font-size: 34px;
+            }
+            .distance-circle .value {
+                font-size: 30px;
+            }
+            .speed-circle .icon {
+                font-size: 24px;
+            }
+            .distance-circle .icon {
+                font-size: 20px;
+            }
+            .container {
+                padding: 8px 8px 6px;
+                gap: 4px;
+            }
+            .btn-track {
+                padding: 8px 16px;
+                font-size: 10px;
+            }
+            .btn-reset {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            .status-text {
+                font-size: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
 
-        <!-- স্পিড কার্ড (বৃত্ত) -->
-        <div class="glass-card">
-            <div class="circle-wrapper">
-                <div class="circle-card speed-card">
-                    <span class="label">🚀 গতি</span>
-                    <div class="value" id="speedDisplay">
-                        0.0 <span class="unit">km/h</span>
-                    </div>
-                </div>
-                <!-- দূরত্ব কার্ড (বৃত্ত) -->
-                <div class="circle-card distance-card">
-                    <span class="label">📍 দূরত্ব</span>
-                    <div class="value" id="distanceDisplay">
-                        0.00 <span class="unit">km</span>
-                    </div>
+        <!-- ====== স্পিড কার্ড ====== -->
+        <div class="speed-circle" id="speedCircle">
+            <div class="inner-bg"></div>
+            <div class="content">
+                <div class="icon">🚀</div>
+                <div class="label">স্পিড</div>
+                <div class="value" id="speedDisplay">
+                    0.0 <span class="unit">km/h</span>
                 </div>
             </div>
-            <!-- বাটন -->
-            <button class="btn-track" id="trackBtn">▶ ট্র্যাকিং শুরু করুন</button>
-            <div class="status-text" id="statusText">🛰️ GPS সিগন্যালের জন্য অপেক্ষা...</div>
+        </div>
+
+        <!-- ====== স্ট্যাটাস ====== -->
+        <div class="status-area">
+            <div class="status-text" id="statusText">🛰️ শুরু করতে বাটনে ক্লিক করুন</div>
+            <div class="rgb-dots">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+
+        <!-- ====== দূরত্ব কার্ড ====== -->
+        <div class="distance-circle" id="distanceCircle">
+            <div class="inner-bg"></div>
+            <div class="content">
+                <div class="icon">📍</div>
+                <div class="label">দূরত্ব</div>
+                <div class="value" id="distanceDisplay">
+                    0.00 <span class="unit">km</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== বাটন এলাকা ====== -->
+        <div class="button-area">
+            <button class="btn-track" id="trackBtn">▶ শুরু</button>
+            <button class="btn-reset" id="resetBtn" title="রিসেট">↺</button>
         </div>
 
     </div>
@@ -236,22 +646,68 @@
         (function() {
             "use strict";
 
-            // ডম এলিমেন্ট
+            // DOM এলিমেন্ট
             const speedEl = document.getElementById('speedDisplay');
             const distanceEl = document.getElementById('distanceDisplay');
             const trackBtn = document.getElementById('trackBtn');
+            const resetBtn = document.getElementById('resetBtn');
             const statusText = document.getElementById('statusText');
 
-            // ভেরিয়েবল
+            // স্টেট
             let lastLat = null;
             let lastLon = null;
-            let totalDistance = 0; // km
+            let totalDistance = 0;
             let watchId = null;
             let isTracking = false;
+            let lastSpeed = 0;
+            let isFirstLoad = true;
 
-            // হ্যাভারসাইন দূরত্ব (km)
+            // লোকাল স্টোরেজ কী
+            const STORAGE_KEY = 'speedTrackerData';
+
+            // ====== লোকাল স্টোরেজ ফাংশন ======
+            function saveData() {
+                try {
+                    const data = {
+                        totalDistance: totalDistance,
+                        lastLat: lastLat,
+                        lastLon: lastLon,
+                        lastSpeed: lastSpeed,
+                        timestamp: Date.now()
+                    };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                } catch (e) {
+                    console.warn('Save failed:', e);
+                }
+            }
+
+            function loadData() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (!raw) return false;
+                    const data = JSON.parse(raw);
+                    totalDistance = data.totalDistance || 0;
+                    lastLat = data.lastLat || null;
+                    lastLon = data.lastLon || null;
+                    lastSpeed = data.lastSpeed || 0;
+                    return true;
+                } catch (e) {
+                    console.warn('Load failed:', e);
+                    return false;
+                }
+            }
+
+            function clearData() {
+                try {
+                    localStorage.removeItem(STORAGE_KEY);
+                } catch (e) {
+                    console.warn('Clear failed:', e);
+                }
+            }
+
+            // ====== হ্যাভারসাইন দূরত্ব ======
             function calculateDistance(lat1, lon1, lat2, lon2) {
-                const R = 6371; 
+                const R = 6371;
                 const dLat = (lat2 - lat1) * Math.PI / 180;
                 const dLon = (lon2 - lon1) * Math.PI / 180;
                 const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -261,80 +717,66 @@
                 return R * c;
             }
 
-            // UI আপডেট (স্পিড + দূরত্ব)
+            // ====== UI আপডেট ======
             function updateUI(speedKmH, distanceKm) {
-                // স্পিড
-                if (speedKmH !== undefined && speedKmH !== null) {
+                if (speedKmH !== undefined && speedKmH !== null && speedKmH >= 0) {
                     speedEl.innerHTML = `${speedKmH.toFixed(1)} <span class="unit">km/h</span>`;
                 } else {
                     speedEl.innerHTML = `0.0 <span class="unit">km/h</span>`;
                 }
 
-                // দূরত্ব
-                if (distanceKm !== undefined && distanceKm !== null) {
+                if (distanceKm !== undefined && distanceKm !== null && distanceKm >= 0) {
                     distanceEl.innerHTML = `${distanceKm.toFixed(2)} <span class="unit">km</span>`;
                 } else {
                     distanceEl.innerHTML = `0.00 <span class="unit">km</span>`;
                 }
             }
 
-            // লোকেশন কলব্যাক
+            // ====== লোকেশন কলব্যাক ======
             function handlePosition(position) {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                const speedMps = position.coords.speed; // m/s (null হতে পারে)
+                const speedMps = position.coords.speed;
 
-                // স্পিড কিমি/ঘন্টা
                 let speedKmH = 0;
                 if (speedMps !== null && speedMps >= 0) {
                     speedKmH = speedMps * 3.6;
+                    lastSpeed = speedKmH;
                 } else {
-                    // স্পিড না এলে পূর্ববর্তী পয়েন্টের সাথে সময়ের ব্যবধান ধরে হিসাব (ঐচ্ছিক)
-                    // কিন্তু এখানে আমরা শুধু GPS স্পিড ব্যবহার করছি
-                    speedKmH = 0;
+                    speedKmH = lastSpeed;
                 }
 
-                // দূরত্ব হিসাব (যদি আগের লোকেশন থাকে)
                 if (lastLat !== null && lastLon !== null) {
                     const dist = calculateDistance(lastLat, lastLon, lat, lon);
-                    // ৫ মিটার (0.005 km) এর কম নয়েজ এড়িয়ে চলি
-                    if (dist > 0.005) {
+                    if (dist > 0.003) { // ৩ মিটার নয়েজ ফিল্টার
                         totalDistance += dist;
                     }
                 }
 
-                // শেষ লোকেশন আপডেট
                 lastLat = lat;
                 lastLon = lon;
 
-                // UI আপডেট
                 updateUI(speedKmH, totalDistance);
-                statusText.innerText = '✅ ট্র্যাকিং সচল';
-                statusText.style.color = 'rgba(100, 255, 180, 0.7)';
+                statusText.textContent = '✅ ট্র্যাকিং সচল';
+                statusText.className = 'status-text active';
+                
+                // সেভ
+                saveData();
             }
 
-            // এরর হ্যান্ডেল
             function handleError(error) {
-                let msg = 'GPS লোকেশন পেতে সমস্যা: ';
+                let msg = 'GPS সমস্যা: ';
                 switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        msg += 'অনুমতি অস্বীকৃত।';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        msg += 'লোকেশন পাওয়া যাচ্ছে না।';
-                        break;
-                    case error.TIMEOUT:
-                        msg += 'টাইম আউট।';
-                        break;
-                    default:
-                        msg += error.message;
+                    case error.PERMISSION_DENIED: msg += 'অনুমতি অস্বীকৃত'; break;
+                    case error.POSITION_UNAVAILABLE: msg += 'লোকেশন নেই'; break;
+                    case error.TIMEOUT: msg += 'টাইম আউট'; break;
+                    default: msg += error.message;
                 }
-                statusText.innerText = '⚠️ ' + msg;
-                statusText.style.color = 'rgba(255, 150, 150, 0.8)';
-                // তবুও UI রিসেট না
+                statusText.textContent = '⚠️ ' + msg;
+                statusText.className = 'status-text error';
             }
 
-            // ট্র্যাকিং শুরু
+            // ====== ট্র্যাকিং কন্ট্রোল ======
             function startTracking() {
                 if (!("geolocation" in navigator)) {
                     alert("আপনার ব্রাউজার Geolocation সাপোর্ট করে না।");
@@ -342,19 +784,10 @@
                 }
 
                 if (isTracking) {
-                    // ইতিমধ্যে চলছে — থামান
                     stopTracking();
                     return;
                 }
 
-                // রিসেট (যদি নতুন শুরু করতে চান)
-                // আমরা কিন্তু আগের দূরত্ব রিসেট করব না, কারণ ইউজার চাইলে আবার শুরু করতে পারে
-                // তবে বাটনে ক্লিক করলে রিসেট করতে চাইলে নিচের লাইন আনকমেন্ট করুন:
-                // totalDistance = 0;
-                // lastLat = null; lastLon = null;
-                // updateUI(0, totalDistance);
-
-                // প্রথমে লোকেশন ওয়াচ শুরু
                 watchId = navigator.geolocation.watchPosition(
                     handlePosition,
                     handleError,
@@ -366,41 +799,90 @@
                 );
 
                 isTracking = true;
-                trackBtn.innerText = '⏹ ট্র্যাকিং থামান';
-                trackBtn.style.background = 'linear-gradient(135deg, #f09819, #d35400)';
-                statusText.innerText = '📡 লোকেশন সংগ্রহ করা হচ্ছে...';
-                statusText.style.color = 'rgba(255, 220, 100, 0.8)';
-
-                // যদি আগের লোকেশন না থাকে, তাহলে প্রথম লোকেশন পেতে অপেক্ষা
-                // কয়েক সেকেন্ড পর যদি আপডেট না আসে, মেসেজ দেখানো যেতে পারে
+                trackBtn.textContent = '⏹ থামান';
+                trackBtn.className = 'btn-track stop';
+                statusText.textContent = '📡 লোকেশন সংগ্রহ...';
+                statusText.className = 'status-text';
             }
 
-            // ট্র্যাকিং বন্ধ
             function stopTracking() {
                 if (watchId !== null) {
                     navigator.geolocation.clearWatch(watchId);
                     watchId = null;
                 }
                 isTracking = false;
-                trackBtn.innerText = '▶ ট্র্যাকিং শুরু করুন';
-                trackBtn.style.background = 'linear-gradient(135deg, #00b4db, #0083b0)';
-                statusText.innerText = '⏸ ট্র্যাকিং বন্ধ';
-                statusText.style.color = 'rgba(255, 255, 255, 0.4)';
+                trackBtn.textContent = '▶ শুরু';
+                trackBtn.className = 'btn-track';
+                statusText.textContent = '⏸ ট্র্যাকিং বন্ধ';
+                statusText.className = 'status-text';
+                saveData();
             }
 
-            // বাটন ক্লিক ইভেন্ট
+            // ====== রিসেট ফাংশন ======
+            function resetAll() {
+                if (isTracking) {
+                    stopTracking();
+                }
+                
+                // ডাটা রিসেট
+                totalDistance = 0;
+                lastLat = null;
+                lastLon = null;
+                lastSpeed = 0;
+                
+                // UI আপডেট
+                updateUI(0, 0);
+                statusText.textContent = '🔄 রিসেট করা হয়েছে';
+                statusText.className = 'status-text';
+                
+                // লোকাল স্টোরেজ ক্লিয়ার
+                clearData();
+                
+                // ২ সেকেন্ড পর মেসেজ পরিবর্তন
+                setTimeout(() => {
+                    if (!isTracking) {
+                        statusText.textContent = '🛰️ শুরু করতে বাটনে ক্লিক করুন';
+                        statusText.className = 'status-text';
+                    }
+                }, 2000);
+            }
+
+            // ====== লোড হলে আগের ডাটা রিস্টোর ======
+            function restoreData() {
+                if (loadData()) {
+                    updateUI(lastSpeed, totalDistance);
+                    if (totalDistance > 0 || lastSpeed > 0) {
+                        statusText.textContent = '💾 আগের ডাটা রিস্টোর করা হয়েছে';
+                        statusText.className = 'status-text';
+                        setTimeout(() => {
+                            if (!isTracking) {
+                                statusText.textContent = '🛰️ শুরু করতে বাটনে ক্লিক করুন';
+                                statusText.className = 'status-text';
+                            }
+                        }, 2500);
+                    }
+                }
+            }
+
+            // ====== ইভেন্ট লিসেনার ======
             trackBtn.addEventListener('click', startTracking);
+            resetBtn.addEventListener('click', resetAll);
 
-            // পেজ লোড হলে UI ডিফল্ট দেখান
-            updateUI(0, 0);
-            statusText.innerText = '🛰️ শুরু করতে বাটনে ক্লিক করুন';
-
-            // ক্লিনআপ (পেজ আনলোড হলে ওয়াচ বন্ধ)
+            // পেজ আনলোডে সেভ
             window.addEventListener('beforeunload', function() {
+                if (isTracking) {
+                    saveData();
+                }
                 if (watchId !== null) {
                     navigator.geolocation.clearWatch(watchId);
                 }
             });
+
+            // ====== ইনিশিয়ালাইজ ======
+            restoreData();
+            if (!isTracking) {
+                updateUI(0, 0);
+            }
 
         })();
     </script>
