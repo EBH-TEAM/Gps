@@ -1,475 +1,308 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>স্পিড ট্র্যাকার প্রো - আলটিমেট স্মুথ</title>
+    <title>EBH Speed Meter</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
+            background-color: #06090e;
+            color: #ffffff;
             min-height: 100vh;
-            min-height: 100dvh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #070b12;
             padding: 10px;
-            overflow: hidden;
-            position: relative;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(255,0,102,0.05), transparent 40%),
-                radial-gradient(circle at 80% 20%, rgba(0,102,255,0.05), transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(255,204,0,0.03), transparent 60%);
-            animation: bgMove 15s ease-in-out infinite alternate;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        @keyframes bgMove {
-            0% { transform: scale(1) rotate(0deg); }
-            33% { transform: scale(1.1) rotate(120deg); }
-            66% { transform: scale(0.9) rotate(240deg); }
-            100% { transform: scale(1.05) rotate(360deg); }
-        }
-
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .dashboard {
             width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 400px;
-            min-height: 95vh;
-            min-height: 95dvh;
+            max-width: 380px;
+            background: #0a0f16;
+            border-radius: 20px;
+            padding: 20px 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 1px solid rgba(0, 229, 204, 0.1);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 15px 10px 10px;
-            position: relative;
-            z-index: 1;
-            gap: 12px;
+            gap: 15px;
+        }
+
+        /* Top Header */
+        .top-bar {
+            display: flex;
             justify-content: space-between;
+            align-items: center;
+            padding: 0 5px;
         }
 
-        .circle-card {
+        .brand-name {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #00e5cc;
+            text-transform: uppercase;
+        }
+
+        .gps-status {
+            font-size: 11px;
+            color: #00e5cc;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            letter-spacing: 1px;
+        }
+
+        .gps-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ff3366;
+            border-radius: 50%;
+        }
+
+        .gps-dot.active {
+            background-color: #00e5cc;
+            box-shadow: 0 0 8px #00e5cc;
+        }
+
+        /* Gauge Meter Area */
+        .gauge-container {
+            position: relative;
             width: 100%;
-            max-width: 300px;
-            aspect-ratio: 1/1;
-            border-radius: 50%;
+            height: 260px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            position: relative;
-            transition: transform 0.3s ease;
-        }
-
-        .circle-card .inner-bg {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            bottom: 5px;
-            border-radius: 50%;
-            z-index: 0;
-        }
-
-        .circle-card .content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 10px;
         }
 
-        .speed-card {
-            background: radial-gradient(circle at 30% 30%, #141e33, #080e1a);
-        }
-
-        .speed-card .inner-bg {
-            background: radial-gradient(circle at 30% 30%, #141e33, #080e1a);
-        }
-
-        .speed-card::before {
-            content: '';
-            position: absolute;
-            top: -6px;
-            left: -6px;
-            right: -6px;
-            bottom: -6px;
-            border-radius: 50%;
-            background: conic-gradient(from var(--angle, 0deg), 
-                #ff0066, #ff3300, #ffcc00, #33ff66, #00ccff, #9933ff, #ff0066);
-            background-size: 300% 300%;
-            z-index: -1;
-            animation: rgbRunning 2s linear infinite;
-            filter: blur(4px);
-            opacity: 0.7;
-        }
-
-        .speed-card::after {
-            content: '';
-            position: absolute;
-            top: -4px;
-            left: -4px;
-            right: -4px;
-            bottom: -4px;
-            border-radius: 50%;
-            background: conic-gradient(from var(--angle, 0deg), 
-                #ff0066, #ff3300, #ffcc00, #33ff66, #00ccff, #9933ff, #ff0066);
-            background-size: 300% 300%;
-            z-index: -1;
-            animation: rgbRunning 2s linear infinite;
-            filter: blur(12px);
-            opacity: 0.25;
-        }
-
-        @property --angle {
-            syntax: '<angle>';
-            initial-value: 0deg;
-            inherits: false;
-        }
-
-        @keyframes rgbRunning {
-            0% { --angle: 0deg; background-position: 0% 50%; }
-            100% { --angle: 360deg; background-position: 100% 50%; }
-        }
-
-        .anim-container {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .walker-svg, .car-svg {
+        .gauge-svg {
             width: 100%;
             height: 100%;
+        }
+
+        .gauge-bg {
             fill: none;
+            stroke: #121a24;
+            stroke-width: 12;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 0;
             stroke-linecap: round;
-            stroke-linejoin: round;
         }
 
-        .walker-svg {
-            stroke: #33ff66;
-            stroke-width: 4;
-            filter: drop-shadow(0 0 8px rgba(51, 255, 102, 0.6));
+        .gauge-speed {
+            fill: none;
+            stroke: url(#gauge-gradient);
+            stroke-width: 12;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.3s ease;
         }
 
-        .car-svg {
-            stroke: #ffcc00;
+        .needle {
+            stroke: #00e5cc;
             stroke-width: 3;
-            filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.6));
+            stroke-linecap: round;
+            transform-origin: 150px 150px;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 0 6px #00e5cc);
         }
 
-        .walking .leg-1 {
-            animation: legMove1 0.6s ease-in-out infinite alternate;
-            transform-origin: 25px 25px;
-        }
-        .walking .leg-2 {
-            animation: legMove2 0.6s ease-in-out infinite alternate;
-            transform-origin: 25px 25px;
-        }
-        .walking .arm-1 {
-            animation: legMove2 0.6s ease-in-out infinite alternate;
-            transform-origin: 25px 18px;
-        }
-        .walking .arm-2 {
-            animation: legMove1 0.6s ease-in-out infinite alternate;
-            transform-origin: 25px 18px;
+        .needle-center {
+            fill: #0a0f16;
+            stroke: #00e5cc;
+            stroke-width: 3;
         }
 
-        @keyframes legMove1 {
-            0% { transform: rotate(-25deg); }
-            100% { transform: rotate(25deg); }
-        }
-        @keyframes legMove2 {
-            0% { transform: rotate(25deg); }
-            100% { transform: rotate(-25deg); }
+        /* Digital Display */
+        .digital-display {
+            text-align: center;
+            margin-top: -30px;
         }
 
-        .driving {
-            animation: carVibe 0.2s linear infinite alternate;
-        }
-        @keyframes carVibe {
-            0% { transform: translateY(0px); }
-            100% { transform: translateY(-2px); }
-        }
-
-        .speed-card .label {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 4px;
-            color: rgba(255, 255, 255, 0.3);
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
-
-        .speed-card .value {
-            font-size: 56px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #6dd5ff, #3a9bd5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: baseline;
-            gap: 4px;
+        .speed-number {
+            font-size: 64px;
+            font-weight: 800;
+            color: #00e5cc;
             line-height: 1;
-            text-shadow: 0 0 80px rgba(0, 180, 255, 0.1);
+            text-shadow: 0 0 20px rgba(0, 229, 204, 0.3);
         }
 
-        .speed-card .unit {
-            font-size: 18px;
-            font-weight: 400;
-            -webkit-text-fill-color: rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.2);
-        }
-
-        .distance-card {
-            background: radial-gradient(circle at 30% 30%, #1a2e22, #0a1410);
-        }
-
-        .distance-card .inner-bg {
-            background: radial-gradient(circle at 30% 30%, #1a2e22, #0a1410);
-        }
-
-        .distance-card::before {
-            content: '';
-            position: absolute;
-            top: -6px;
-            left: -6px;
-            right: -6px;
-            bottom: -6px;
-            border-radius: 50%;
-            background: conic-gradient(from var(--angle2, 180deg), 
-                #9933ff, #0066ff, #00ccff, #33ff66, #ffcc00, #ff3300, #ff0066, #9933ff);
-            background-size: 300% 300%;
-            z-index: -1;
-            animation: rgbRunning2 2.5s linear infinite;
-            filter: blur(4px);
-            opacity: 0.6;
-        }
-
-        .distance-card::after {
-            content: '';
-            position: absolute;
-            top: -4px;
-            left: -4px;
-            right: -4px;
-            bottom: -4px;
-            border-radius: 50%;
-            background: conic-gradient(from var(--angle2, 180deg), 
-                #9933ff, #0066ff, #00ccff, #33ff66, #ffcc00, #ff3300, #ff0066, #9933ff);
-            background-size: 300% 300%;
-            z-index: -1;
-            animation: rgbRunning2 2.5s linear infinite;
-            filter: blur(12px);
-            opacity: 0.2;
-        }
-
-        @property --angle2 {
-            syntax: '<angle>';
-            initial-value: 180deg;
-            inherits: false;
-        }
-
-        @keyframes rgbRunning2 {
-            0% { --angle2: 180deg; background-position: 0% 50%; }
-            100% { --angle2: 540deg; background-position: 100% 50%; }
-        }
-
-        .distance-card .icon {
-            font-size: 28px;
-            margin-bottom: 2px;
-            filter: drop-shadow(0 0 30px rgba(0, 255, 150, 0.12));
-        }
-
-        .distance-card .label {
+        .unit {
             font-size: 12px;
+            color: #5b6e82;
+            letter-spacing: 3px;
+            margin-top: 4px;
             font-weight: 600;
-            letter-spacing: 4px;
-            color: rgba(255, 255, 255, 0.3);
-            text-transform: uppercase;
-            margin-bottom: 2px;
         }
 
-        .distance-card .value {
-            font-size: 48px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #7dffb3, #3dcc7a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: baseline;
-            gap: 4px;
-            line-height: 1;
-            text-shadow: 0 0 80px rgba(0, 255, 150, 0.06);
+        /* Stats Cards Panel */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            background: #06090e;
+            border-radius: 12px;
+            padding: 12px 5px;
+            border: 1px solid rgba(255,255,255,0.03);
+            text-align: center;
         }
 
-        .distance-card .unit {
-            font-size: 16px;
-            font-weight: 400;
-            -webkit-text-fill-color: rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.2);
-        }
-
-        .status-area {
+        .stat-box {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            width: 100%;
-            padding: 2px 0;
+            gap: 4px;
+            border-right: 1px solid rgba(255,255,255,0.05);
         }
 
-        .status-text {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.25);
+        .stat-box:last-child {
+            border-right: none;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #5b6e82;
             letter-spacing: 1px;
-            text-align: center;
-            font-weight: 300;
+            font-weight: 600;
         }
 
-        .status-text.active { color: rgba(100, 255, 180, 0.8); }
-        .status-text.error { color: rgba(255, 150, 150, 0.8); }
-
-        .rgb-dots {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffb703;
         }
 
-        .rgb-dots span {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            display: inline-block;
-            animation: dotCharge 1.6s ease-in-out infinite;
-            box-shadow: 0 0 15px currentColor;
+        .stat-value.cyan {
+            color: #00e5cc;
         }
 
-        .rgb-dots span:nth-child(1) { background: #ff0066; color: #ff0066; animation-delay: 0s; }
-        .rgb-dots span:nth-child(2) { background: #ffcc00; color: #ffcc00; animation-delay: 0.25s; }
-        .rgb-dots span:nth-child(3) { background: #33ff66; color: #33ff66; animation-delay: 0.5s; }
-        .rgb-dots span:nth-child(4) { background: #0066ff; color: #0066ff; animation-delay: 0.75s; }
-        .rgb-dots span:nth-child(5) { background: #9933ff; color: #9933ff; animation-delay: 1s; }
-
-        @keyframes dotCharge {
-            0%, 100% { transform: scale(0.5); opacity: 0.15; box-shadow: 0 0 5px currentColor; }
-            50% { transform: scale(1.8); opacity: 1; box-shadow: 0 0 25px currentColor, 0 0 50px currentColor; }
-        }
-
-        .button-area {
+        /* Control Buttons */
+        .controls {
             display: flex;
             gap: 10px;
-            width: 100%;
-            max-width: 320px;
-            justify-content: center;
-            align-items: center;
-            margin-top: 4px;
+            margin-top: 5px;
         }
 
-        .btn-track {
-            padding: 10px 25px;
-            font-size: 12px;
-            font-weight: 600;
-            background: linear-gradient(135deg, #00b4db, #0083b0);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            letter-spacing: 2px;
-            box-shadow: 0 8px 30px rgba(0, 150, 255, 0.12);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            text-transform: uppercase;
+        .btn {
             flex: 1;
-            position: relative;
-            overflow: hidden;
-            min-height: 42px;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
         }
 
-        .btn-track.stop { background: linear-gradient(135deg, #f09819, #d35400); }
+        .btn-start {
+            background: #00e5cc;
+            color: #06090e;
+            box-shadow: 0 0 15px rgba(0, 229, 204, 0.2);
+        }
+
+        .btn-start.stop {
+            background: #ff3366;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.2);
+        }
 
         .btn-reset {
-            padding: 10px 14px;
-            font-size: 14px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 50px;
-            color: rgba(255, 255, 255, 0.4);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 42px;
-            min-height: 42px;
+            background: #121a24;
+            color: #5b6e82;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .btn-reset:active {
+            color: #ffffff;
+            background: #1a2636;
         }
     </style>
 </head>
 <body>
 
-    <div class="particles" id="particles"></div>
-
-    <div class="container">
-        <div class="circle-card speed-card">
-            <div class="inner-bg"></div>
-            <div class="content">
-                <div class="anim-container" id="animBox"></div>
-                <div class="label">স্পিড</div>
-                <div class="value" id="speedDisplay">0.0 <span class="unit">km/h</span></div>
+    <div class="dashboard">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="brand-name">EBH Speed Meter</div>
+            <div class="gps-status">
+                <div class="gps-dot" id="gpsDot"></div>
+                <span id="gpsText">GPS OFF</span>
             </div>
         </div>
 
-        <div class="circle-card distance-card">
-            <div class="inner-bg"></div>
-            <div class="content">
-                <div class="icon">📍</div>
-                <div class="label">দূরত্ব</div>
-                <div class="value" id="distanceDisplay">0.00 <span class="unit">km</span></div>
+        <!-- Gauge Dial -->
+        <div class="gauge-container">
+            <svg class="gauge-svg" viewBox="0 0 300 300">
+                <defs>
+                    <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#00e5cc" />
+                        <stop offset="70%" stop-color="#ffb703" />
+                        <stop offset="100%" stop-color="#ff3366" />
+                    </linearGradient>
+                </defs>
+
+                <!-- Background Arc -->
+                <path class="gauge-bg" d="M 50 220 A 120 120 0 1 1 250 220" />
+                
+                <!-- Speed Arc -->
+                <path class="gauge-speed" id="gaugeArc" d="M 50 220 A 120 120 0 1 1 250 220" />
+
+                <!-- Ticks & Numbers -->
+                <!-- 0 -->
+                <text x="50" y="240" fill="#5b6e82" font-size="10" text-anchor="middle">0</text>
+                <!-- 20 -->
+                <text x="35" y="160" fill="#5b6e82" font-size="10" text-anchor="middle">20</text>
+                <!-- 40 -->
+                <text x="65" y="90" fill="#5b6e82" font-size="10" text-anchor="middle">40</text>
+                <!-- 60 -->
+                <text x="150" y="55" fill="#5b6e82" font-size="10" text-anchor="middle">60</text>
+                <!-- 80 -->
+                <text x="235" y="90" fill="#5b6e82" font-size="10" text-anchor="middle">80</text>
+                <!-- 100 -->
+                <text x="265" y="160" fill="#5b6e82" font-size="10" text-anchor="middle">100</text>
+                <!-- 120 -->
+                <text x="250" y="240" fill="#ff3366" font-size="10" text-anchor="middle">120</text>
+
+                <!-- Needle -->
+                <line id="needle" class="needle" x1="150" y1="150" x2="65" y2="215" />
+                <circle class="needle-center" cx="150" cy="150" r="8" />
+            </svg>
+        </div>
+
+        <!-- Digital Speed -->
+        <div class="digital-display">
+            <div class="speed-number" id="speedText">0</div>
+            <div class="unit">KM / H</div>
+        </div>
+
+        <!-- Stats Panel -->
+        <div class="stats-panel">
+            <div class="stat-box">
+                <div class="stat-label">AVG</div>
+                <div class="stat-value" id="avgSpeed">0.0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">MAX</div>
+                <div class="stat-value" id="maxSpeed">0.0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">TRIP</div>
+                <div class="stat-value cyan" id="tripDist">0.00</div>
             </div>
         </div>
 
-        <div class="status-area">
-            <div class="status-text" id="statusText">🛰️ ট্র্যাকিং শুরু করতে ক্লিক করুন</div>
-            <div class="rgb-dots">
-                <span></span><span></span><span></span><span></span><span></span>
-            </div>
-        </div>
-
-        <div class="button-area">
-            <button class="btn-track" id="trackBtn">▶ শুরু</button>
-            <button class="btn-reset" id="resetBtn" title="রিসেট">↺</button>
+        <!-- Buttons -->
+        <div class="controls">
+            <button class="btn btn-start" id="startBtn">START</button>
+            <button class="btn btn-reset" id="resetBtn">RESET</button>
         </div>
     </div>
 
@@ -477,230 +310,214 @@
         (function() {
             "use strict";
 
-            const speedEl = document.getElementById('speedDisplay');
-            const distanceEl = document.getElementById('distanceDisplay');
-            const trackBtn = document.getElementById('trackBtn');
+            // Elements
+            const speedText = document.getElementById('speedText');
+            const avgSpeedEl = document.getElementById('avgSpeed');
+            const maxSpeedEl = document.getElementById('maxSpeed');
+            const tripDistEl = document.getElementById('tripDist');
+            const startBtn = document.getElementById('startBtn');
             const resetBtn = document.getElementById('resetBtn');
-            const statusText = document.getElementById('statusText');
-            const animBox = document.getElementById('animBox');
+            const gpsDot = document.getElementById('gpsDot');
+            const gpsText = document.getElementById('gpsText');
+            const needle = document.getElementById('needle');
+            const gaugeArc = document.getElementById('gaugeArc');
 
-            const walkerSVG = `
-                <svg class="walker-svg" viewBox="0 0 50 50">
-                    <circle cx="25" cy="10" r="4" fill="#33ff66" stroke="none" />
-                    <line x1="25" y1="14" x2="25" y2="28" />
-                    <line class="arm-1" x1="25" y1="18" x2="17" y2="25" />
-                    <line class="arm-2" x1="25" y1="18" x2="33" y2="25" />
-                    <line class="leg-1" x1="25" y1="28" x2="16" y2="42" />
-                    <line class="leg-2" x1="25" y1="28" x2="34" y2="42" />
-                </svg>`;
-
-            const carSVG = `
-                <svg class="car-svg" viewBox="0 0 50 50">
-                    <path d="M 8 28 L 14 18 L 36 18 L 42 28 Z" fill="none" />
-                    <rect x="5" y="28" width="40" height="10" rx="3" fill="#ffcc00" stroke="none" />
-                    <circle cx="14" cy="38" r="4" fill="#070b12" stroke="#ffcc00" stroke-width="2" />
-                    <circle cx="36" cy="38" r="4" fill="#070b12" stroke="#ffcc00" stroke-width="2" />
-                </svg>`;
-
-            animBox.innerHTML = walkerSVG;
-
+            // Variables
             let watchId = null;
             let isTracking = false;
 
+            let currentSpeed = 0;
             let targetSpeed = 0;
-            let currentDisplaySpeed = 0;
-            let targetDistance = parseFloat(localStorage.getItem('speed_tracker_distance')) || 0;
-            let currentDisplayDistance = targetDistance;
+            
+            let maxSpeed = parseFloat(localStorage.getItem('ebh_max_speed')) || 0;
+            let tripDistance = parseFloat(localStorage.getItem('ebh_trip_dist')) || 0;
+            let speedSamples = JSON.parse(localStorage.getItem('ebh_speed_samples')) || [];
 
             let lastLat = null;
             let lastLon = null;
             let lastTime = null;
-            let lastValidMovementTime = Date.now();
 
-            // লাফালাফি রোধে ৩টি ডাটা পয়েন্টের মুভিং এভারেজ
-            let speedHistory = [];
+            // Gauge Setup (Arc calculation)
+            const maxGaugeSpeed = 120; // Gauge capacity 120 km/h
+            const arcTotalLength = 565; // Total stroke dash length for arc
 
-            function getAverageSpeed(newSpeed) {
-                speedHistory.push(newSpeed);
-                if (speedHistory.length > 3) {
-                    speedHistory.shift();
-                }
-                const sum = speedHistory.reduce((a, b) => a + b, 0);
-                return sum / speedHistory.length;
+            function setGaugeSpeed(speed) {
+                // Limit speed for gauge display
+                const clampedSpeed = Math.min(Math.max(speed, 0), maxGaugeSpeed);
+                
+                // Calculate Needle Rotation (-135deg to +135deg)
+                const angle = -135 + (clampedSpeed / maxGaugeSpeed) * 270;
+                needle.style.transform = `rotate(${angle}deg)`;
+
+                // Calculate Arc Fill
+                const offset = arcTotalLength - (clampedSpeed / maxGaugeSpeed) * (arcTotalLength * 0.75);
+                gaugeArc.style.strokeDashoffset = offset;
             }
 
-            // স্মুথ রেন্ডারিং লুপ (গুগল ম্যাপ স্টাইল)
+            // Restore Saved Stats
+            function updateSavedUI() {
+                maxSpeedEl.textContent = maxSpeed.toFixed(1);
+                tripDistEl.textContent = tripDistance.toFixed(2);
+                
+                if (speedSamples.length > 0) {
+                    const avg = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
+                    avgSpeedEl.textContent = avg.toFixed(1);
+                } else {
+                    avgSpeedEl.textContent = "0.0";
+                }
+            }
+            updateSavedUI();
+
+            // Smooth Loop for UI Updating
             function animateLoop() {
-                const now = Date.now();
-
-                // কেবল ১০ সেকেন্ড কোনো মুভমেন্ট না থাকলে গতি আস্তে আস্তে জিরো করা হবে
-                if (now - lastValidMovementTime > 10000 && targetSpeed > 0) {
-                    targetSpeed = Math.max(0, targetSpeed - 0.1);
-                }
-
-                // গতি মসৃণভাবে পরিবর্তন (গুগল ম্যাপের মতো রিডিং কানেক্টেড থাকবে)
-                const diff = targetSpeed - currentDisplaySpeed;
-                if (Math.abs(diff) > 0.02) {
-                    currentDisplaySpeed += diff * 0.08;
+                const diff = targetSpeed - currentSpeed;
+                if (Math.abs(diff) > 0.1) {
+                    currentSpeed += diff * 0.1;
                 } else {
-                    currentDisplaySpeed = targetSpeed;
+                    currentSpeed = targetSpeed;
                 }
 
-                // দূরত্ব হিসাব
-                const distDiff = targetDistance - currentDisplayDistance;
-                if (Math.abs(distDiff) > 0.0001) {
-                    currentDisplayDistance += distDiff * 0.05;
-                } else {
-                    currentDisplayDistance = targetDistance;
-                }
-
-                const renderSpeed = currentDisplaySpeed < 0.2 ? 0 : currentDisplaySpeed;
-                speedEl.innerHTML = `${renderSpeed.toFixed(1)} <span class="unit">km/h</span>`;
-                distanceEl.innerHTML = `${currentDisplayDistance.toFixed(2)} <span class="unit">km</span>`;
-
-                if (renderSpeed < 0.3) {
-                    animBox.className = 'anim-container';
-                    animBox.innerHTML = walkerSVG;
-                } else if (renderSpeed <= 6.0) {
-                    animBox.className = 'anim-container walking';
-                    animBox.innerHTML = walkerSVG;
-                } else {
-                    animBox.className = 'anim-container driving';
-                    animBox.innerHTML = carSVG;
-                }
+                const displaySpeed = currentSpeed < 0.3 ? 0 : currentSpeed;
+                speedText.textContent = Math.round(displaySpeed);
+                setGaugeSpeed(displaySpeed);
 
                 requestAnimationFrame(animateLoop);
             }
-
             requestAnimationFrame(animateLoop);
 
-            function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+            // Haversine Distance Calc
+            function calculateDistance(lat1, lon1, lat2, lon2) {
                 const R = 6371000;
                 const dLat = (lat2 - lat1) * Math.PI / 180;
                 const dLon = (lon2 - lon1) * Math.PI / 180;
                 const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                           Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                           Math.sin(dLon/2) * Math.sin(dLon/2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                return R * c; 
+                return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             }
 
-            function handlePosition(position) {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                const accuracy = position.coords.accuracy;
-                const currentTime = position.timestamp;
+            // GPS Success Callback
+            function handlePosition(pos) {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                const accuracy = pos.coords.accuracy;
+                const now = pos.timestamp;
 
-                // দুর্বল সংকেতেও ড্রপ করবে না (টলারেন্স ৮০ মিটার)
-                if (accuracy > 80) {
-                    return;
-                }
+                gpsDot.classList.add('active');
+                gpsText.textContent = 'GPS READY';
 
-                if (lastLat === null || lastLon === null) {
+                if (accuracy > 70) return; // Ignore bad signals
+
+                if (lastLat === null) {
                     lastLat = lat;
                     lastLon = lon;
-                    lastTime = currentTime;
+                    lastTime = now;
                     return;
                 }
 
-                const distM = calculateDistanceMeters(lastLat, lastLon, lat, lon);
-                const timeS = (currentTime - lastTime) / 1000;
+                const distM = calculateDistance(lastLat, lastLon, lat, lon);
+                const timeS = (now - lastTime) / 1000;
 
-                let rawSpeed = 0;
-                
-                // ১. ডিভাইস জিপিএস স্পিড চেক
-                if (position.coords.speed !== null && position.coords.speed > 0) {
-                    rawSpeed = position.coords.speed * 3.6;
-                } 
-                // ২. ম্যানুয়াল দূরত্ব/সময় দিয়ে গতি হিসাব
-                else if (timeS > 0) {
-                    rawSpeed = (distM / timeS) * 3.6;
+                let calculatedSpeed = 0;
+
+                if (pos.coords.speed !== null && pos.coords.speed >= 0) {
+                    calculatedSpeed = pos.coords.speed * 3.6;
+                } else if (timeS > 0) {
+                    calculatedSpeed = (distM / timeS) * 3.6;
                 }
 
-                // গতি যদি ০.২ কিমির বেশি হয়, তবেই রানিং গতি আপডেট হবে
-                if (rawSpeed >= 0.2 || distM >= 0.3) {
-                    const smoothSpeed = getAverageSpeed(rawSpeed);
-                    targetSpeed = smoothSpeed;
-                    lastValidMovementTime = Date.now();
+                // Filter Walking Noise
+                if (distM < 0.4 && calculatedSpeed < 0.5) {
+                    targetSpeed = 0;
+                } else {
+                    targetSpeed = calculatedSpeed;
 
-                    // দূরত্বের সঠিক আপডেট
-                    if (distM >= 0.3) {
-                        targetDistance += (distM / 1000);
-                        localStorage.setItem('speed_tracker_distance', targetDistance.toString());
+                    // Update Distance
+                    if (distM >= 0.4) {
+                        tripDistance += (distM / 1000);
+                        localStorage.setItem('ebh_trip_dist', tripDistance);
+                        tripDistEl.textContent = tripDistance.toFixed(2);
+                    }
+
+                    // Update Max Speed
+                    if (calculatedSpeed > maxSpeed) {
+                        maxSpeed = calculatedSpeed;
+                        localStorage.setItem('ebh_max_speed', maxSpeed);
+                        maxSpeedEl.textContent = maxSpeed.toFixed(1);
+                    }
+
+                    // Update Average Speed
+                    if (calculatedSpeed > 0.5) {
+                        speedSamples.push(calculatedSpeed);
+                        if (speedSamples.length > 500) speedSamples.shift(); // keep array light
+                        localStorage.setItem('ebh_speed_samples', JSON.stringify(speedSamples));
+                        
+                        const avg = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
+                        avgSpeedEl.textContent = avg.toFixed(1);
                     }
 
                     lastLat = lat;
                     lastLon = lon;
-                    lastTime = currentTime;
-
-                    if (targetSpeed <= 6.0) {
-                        statusText.textContent = '🚶‍♂️ হাঁটা সনাক্ত হয়েছে';
-                    } else {
-                        statusText.textContent = '🚗 গাড়ি রানিং রয়েছে';
-                    }
-                    statusText.className = 'status-text active';
+                    lastTime = now;
                 }
             }
 
             function handleError() {
-                statusText.textContent = '⚠️ GPS সংকেত খোঁজা হচ্ছে...';
-                statusText.className = 'status-text error';
+                gpsDot.classList.remove('active');
+                gpsText.textContent = 'SEARCHING';
             }
 
-            function startTracking() {
+            // Start / Stop Functions
+            function toggleTracking() {
                 if (!("geolocation" in navigator)) {
-                    alert("GPS সাপোর্ট নেই।");
+                    alert("GPS not supported on your browser.");
                     return;
                 }
 
                 if (isTracking) {
-                    stopTracking();
-                    return;
-                }
-
-                watchId = navigator.geolocation.watchPosition(
-                    handlePosition,
-                    handleError,
-                    { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
-                );
-
-                isTracking = true;
-                trackBtn.textContent = '⏹ থামান';
-                trackBtn.className = 'btn-track stop';
-                statusText.textContent = '📡 ট্র্যাকিং রানিং আছে...';
-                statusText.className = 'status-text active';
-            }
-
-            function stopTracking() {
-                if (watchId !== null) {
                     navigator.geolocation.clearWatch(watchId);
                     watchId = null;
+                    isTracking = false;
+                    targetSpeed = 0;
+                    startBtn.textContent = "START";
+                    startBtn.classList.remove("stop");
+                    gpsDot.classList.remove("active");
+                    gpsText.textContent = "GPS OFF";
+                } else {
+                    watchId = navigator.geolocation.watchPosition(
+                        handlePosition,
+                        handleError,
+                        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+                    );
+                    isTracking = true;
+                    startBtn.textContent = "STOP";
+                    startBtn.classList.add("stop");
+                    gpsText.textContent = "CONNECTING";
                 }
-                isTracking = false;
-                targetSpeed = 0;
-                speedHistory = [];
-                trackBtn.textContent = '▶ শুরু';
-                trackBtn.className = 'btn-track';
-                statusText.textContent = '⏸ ট্র্যাকিং বন্ধ';
-                statusText.className = 'status-text';
             }
 
+            // Reset Function
             function resetAll() {
-                if (isTracking) stopTracking();
-                targetDistance = 0;
-                currentDisplayDistance = 0;
+                if (isTracking) toggleTracking();
+                
+                maxSpeed = 0;
+                tripDistance = 0;
+                speedSamples = [];
                 targetSpeed = 0;
-                currentDisplaySpeed = 0;
-                speedHistory = [];
+                currentSpeed = 0;
                 lastLat = null;
                 lastLon = null;
-                lastTime = null;
-                localStorage.removeItem('speed_tracker_distance');
-                statusText.textContent = '🔄 রিসেট সম্পন্ন হয়েছে';
-                statusText.className = 'status-text';
+
+                localStorage.removeItem('ebh_max_speed');
+                localStorage.removeItem('ebh_trip_dist');
+                localStorage.removeItem('ebh_speed_samples');
+
+                updateSavedUI();
+                speedText.textContent = "0";
+                setGaugeSpeed(0);
             }
 
-            trackBtn.addEventListener('click', startTracking);
+            startBtn.addEventListener('click', toggleTracking);
             resetBtn.addEventListener('click', resetAll);
 
         })();
