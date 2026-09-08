@@ -521,7 +521,6 @@
             let watchId = null;
             let isTracking = false;
 
-            // গুগল ম্যাপের মতো স্মুথ অ্যানিমেশনের জন্য টার্গেট এবং কারেন্ট মান
             let targetSpeed = 0;
             let currentDisplaySpeed = 0;
             let targetDistance = parseFloat(localStorage.getItem('speed_tracker_distance')) || 0;
@@ -531,35 +530,28 @@
             let lastLon = null;
             let lastTime = null;
 
-            // গুগল ম্যাপের মতো ক্রমাগত ০.০১ স্মুথিং অ্যানিমেশন লুপ
+            // গুগল ম্যাপ স্টাইল স্মুথিং ইঞ্জিন
             function animateLoop() {
-                // স্পিড ০.০১ করে বাড়ানো বা কমানো
-                if (Math.abs(currentDisplaySpeed - targetSpeed) > 0.01) {
-                    if (currentDisplaySpeed < targetSpeed) {
-                        currentDisplaySpeed += 0.03; // গ্র্যাজুয়াল রাইজ
-                    } else {
-                        currentDisplaySpeed -= 0.03; // গ্র্যাজুয়াল ড্রপ
-                    }
+                const diff = targetSpeed - currentDisplaySpeed;
+                if (Math.abs(diff) > 0.01) {
+                    // দ্রুত সাড়া দিতে গতিশীল ইন্টারপোলেশন
+                    currentDisplaySpeed += diff * 0.1;
                 } else {
                     currentDisplaySpeed = targetSpeed;
                 }
 
-                // দূরত্ব ০.০০১ করে গ্র্যাজুয়ালি আপডেট
-                if (Math.abs(currentDisplayDistance - targetDistance) > 0.001) {
-                    if (currentDisplayDistance < targetDistance) {
-                        currentDisplayDistance += 0.0005;
-                    }
+                const distDiff = targetDistance - currentDisplayDistance;
+                if (Math.abs(distDiff) > 0.0001) {
+                    currentDisplayDistance += distDiff * 0.1;
                 } else {
                     currentDisplayDistance = targetDistance;
                 }
 
-                // UI রেন্ডার (0.01 স্টিপ অনুযায়ী)
-                const renderSpeed = currentDisplaySpeed < 0.05 ? 0 : currentDisplaySpeed;
+                const renderSpeed = currentDisplaySpeed < 0.1 ? 0 : currentDisplaySpeed;
                 speedEl.innerHTML = `${renderSpeed.toFixed(1)} <span class="unit">km/h</span>`;
                 distanceEl.innerHTML = `${currentDisplayDistance.toFixed(2)} <span class="unit">km</span>`;
 
-                // আইকন অ্যানিমেশন কন্ট্রোল
-                if (renderSpeed <= 0.2) {
+                if (renderSpeed < 0.2) {
                     animBox.className = 'anim-container';
                     animBox.innerHTML = walkerSVG;
                 } else if (renderSpeed <= 6.0) {
@@ -592,10 +584,10 @@
                 const accuracy = position.coords.accuracy;
                 const currentTime = position.timestamp;
 
-                if (accuracy > 30) {
-                    statusText.textContent = '⚠️ সিগন্যাল খোঁজা হচ্ছে...';
+                // দুর্বল সিগন্যাল টলারেন্স বাড়িয়ে ৫০ মিটার করা হলো (যাতে ধীরগতির হাঁটা মিস না হয়)
+                if (accuracy > 50) {
+                    statusText.textContent = '⚠️ দুর্বল জিপিএস সংকেত...';
                     statusText.className = 'status-text error';
-                    targetSpeed = 0;
                     return;
                 }
 
@@ -617,22 +609,26 @@
                     calculatedSpeed = (distM / timeS) * 3.6;
                 }
 
-                // গুগল ম্যাপের কঠোর ড্রিপ্ট ফিল্টার (স্থির থাকলে একদম ০.০)
-                if (distM < 2.0 || calculatedSpeed < 0.8) {
+                // হাঁটার জন্য থ্রেশহোল্ড সংবেদনশীল করা হয়েছে (0.3 km/h এবং 0.5 মিটারের মুভমেন্টও ধরা পড়বে)
+                if (distM < 0.5 && calculatedSpeed < 0.3) {
                     targetSpeed = 0;
                     statusText.textContent = '🅿️ অবস্থান স্থির (০.০)';
                     statusText.className = 'status-text';
                 } else {
                     targetSpeed = calculatedSpeed;
-                    targetDistance += (distM / 1000);
-                    localStorage.setItem('speed_tracker_distance', targetDistance.toString());
+                    
+                    // শুধু বাস্তব গতির দূরত্বের ক্ষেত্রেই দূরত্ব যোগ হবে
+                    if (calculatedSpeed >= 0.3) {
+                        targetDistance += (distM / 1000);
+                        localStorage.setItem('speed_tracker_distance', targetDistance.toString());
+                    }
 
                     lastLat = lat;
                     lastLon = lon;
                     lastTime = currentTime;
 
                     if (targetSpeed <= 6.0) {
-                        statusText.textContent = '🚶‍♂️ হাঁটা শনাক্ত হয়েছে';
+                        statusText.textContent = '🚶‍♂️ হাঁটা সনাক্ত হয়েছে';
                     } else {
                         statusText.textContent = '🚗 গাড়ি রানিং রয়েছে';
                     }
