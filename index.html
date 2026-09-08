@@ -173,38 +173,67 @@
             100% { --angle: 360deg; background-position: 100% 50%; }
         }
 
-        .mode-animation {
-            font-size: 48px;
+        .anim-container {
+            width: 50px;
+            height: 50px;
             margin-bottom: 2px;
-            transition: all 0.3s ease;
-            display: inline-block;
-            filter: drop-shadow(0 0 30px rgba(0, 180, 255, 0.15));
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .mode-animation.walking {
-            animation: walkMove 0.5s ease-in-out infinite alternate;
-            filter: drop-shadow(0 0 35px rgba(51, 255, 102, 0.5));
+        .walker-svg, .car-svg {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
-        .mode-animation.driving {
-            animation: carMove 0.4s ease-in-out infinite alternate;
-            filter: drop-shadow(0 0 40px rgba(255, 200, 0, 0.5));
+        .walker-svg {
+            stroke: #33ff66;
+            stroke-width: 4;
+            filter: drop-shadow(0 0 8px rgba(51, 255, 102, 0.6));
         }
 
-        .mode-animation.stopped {
-            animation: none;
-            opacity: 0.4;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.05));
+        .car-svg {
+            stroke: #ffcc00;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.6));
         }
 
-        @keyframes walkMove {
-            0% { transform: translateY(0) rotate(-4deg); }
-            100% { transform: translateY(-6px) rotate(4deg); }
+        .walking .leg-1 {
+            animation: legMove1 0.6s ease-in-out infinite alternate;
+            transform-origin: 25px 25px;
+        }
+        .walking .leg-2 {
+            animation: legMove2 0.6s ease-in-out infinite alternate;
+            transform-origin: 25px 25px;
+        }
+        .walking .arm-1 {
+            animation: legMove2 0.6s ease-in-out infinite alternate;
+            transform-origin: 25px 18px;
+        }
+        .walking .arm-2 {
+            animation: legMove1 0.6s ease-in-out infinite alternate;
+            transform-origin: 25px 18px;
         }
 
-        @keyframes carMove {
-            0% { transform: translateX(-6px) scale(1); }
-            100% { transform: translateX(6px) scale(1.04); }
+        @keyframes legMove1 {
+            0% { transform: rotate(-25deg); }
+            100% { transform: rotate(25deg); }
+        }
+        @keyframes legMove2 {
+            0% { transform: rotate(25deg); }
+            100% { transform: rotate(-25deg); }
+        }
+
+        .driving {
+            animation: carVibe 0.2s linear infinite alternate;
+        }
+        @keyframes carVibe {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-2px); }
         }
 
         .speed-card .label {
@@ -461,7 +490,6 @@
             .speed-card .unit { font-size: 15px; }
             .distance-card .value { font-size: 38px; }
             .distance-card .unit { font-size: 13px; }
-            .mode-animation { font-size: 38px; }
             .btn-track { padding: 8px 18px; font-size: 11px; min-height: 38px; }
             .btn-reset { padding: 8px 12px; font-size: 13px; min-height: 38px; min-width: 38px; }
             .container { padding: 10px 8px 6px; gap: 8px; }
@@ -476,7 +504,9 @@
         <div class="circle-card speed-card">
             <div class="inner-bg"></div>
             <div class="content">
-                <div class="mode-animation stopped" id="modeIcon">🚶‍♂️</div>
+                <div class="anim-container" id="animBox">
+                    <!-- SVG Walker Animation Placeholder -->
+                </div>
                 <div class="label">স্পিড</div>
                 <div class="value" id="speedDisplay">0.0 <span class="unit">km/h</span></div>
             </div>
@@ -513,7 +543,7 @@
             const trackBtn = document.getElementById('trackBtn');
             const resetBtn = document.getElementById('resetBtn');
             const statusText = document.getElementById('statusText');
-            const modeIcon = document.getElementById('modeIcon');
+            const animBox = document.getElementById('animBox');
 
             function createParticles() {
                 const container = document.getElementById('particles');
@@ -532,18 +562,38 @@
             }
             createParticles();
 
+            // ভেক্টর অ্যানিমেশন টেমপ্লেট
+            const walkerSVG = `
+                <svg class="walker-svg" viewBox="0 0 50 50">
+                    <circle cx="25" cy="10" r="4" fill="#33ff66" stroke="none" />
+                    <line x1="25" y1="14" x2="25" y2="28" />
+                    <line class="arm-1" x1="25" y1="18" x2="17" y2="25" />
+                    <line class="arm-2" x1="25" y1="18" x2="33" y2="25" />
+                    <line class="leg-1" x1="25" y1="28" x2="16" y2="42" />
+                    <line class="leg-2" x1="25" y1="28" x2="34" y2="42" />
+                </svg>`;
+
+            const carSVG = `
+                <svg class="car-svg" viewBox="0 0 50 50">
+                    <path d="M 8 28 L 14 18 L 36 18 L 42 28 Z" fill="none" />
+                    <rect x="5" y="28" width="40" height="10" rx="3" fill="#ffcc00" stroke="none" />
+                    <circle cx="14" cy="38" r="4" fill="#070b12" stroke="#ffcc00" stroke-width="2" />
+                    <circle cx="36" cy="38" r="4" fill="#070b12" stroke="#ffcc00" stroke-width="2" />
+                </svg>`;
+
+            animBox.innerHTML = walkerSVG;
+
             let lastLat = null;
             let lastLon = null;
             let lastTime = null;
-            let totalDistance = 0;
             let watchId = null;
             let isTracking = false;
-            
-            // গুগল ম্যাপ লেভেল নির্ভুল ফিল্টারিং সেটিংস
-            const MAX_ACCURACY_THRESHOLD = 12; // ১২ মিটারের চেয়ে খারাপ সিগন্যাল বাদ
-            const MIN_REAL_DISTANCE_METERS = 8; // ৮ মিটারের কম সরলে জিপিএস ড্রাফট ব্লক করবে
-            const MIN_WALKING_SPEED = 0.8;      // ০.৮ km/h এর নিচে সম্পূর্ণ ০
-            const CAR_SPEED_THRESHOLD = 6.0;    // ৬ km/h এর নিচে হাঁটা, উপরে গাড়ি
+            let smoothedSpeed = 0;
+            const SMOOTHING_FACTOR = 0.25;
+
+            // লোকাল স্টোরেজ থেকে পূর্বে সেভ হওয়া দূরত্ব লোড করা
+            let totalDistance = parseFloat(localStorage.getItem('speed_tracker_distance')) || 0;
+            distanceEl.innerHTML = `${totalDistance.toFixed(2)} <span class="unit">km</span>`;
 
             function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
                 const R = 6371000;
@@ -556,20 +606,22 @@
                 return R * c; 
             }
 
-            function updateUI(speedKmH, distanceKm) {
-                speedEl.innerHTML = `${speedKmH.toFixed(1)} <span class="unit">km/h</span>`;
+            function updateUI(targetSpeed, distanceKm) {
+                smoothedSpeed = smoothedSpeed + (targetSpeed - smoothedSpeed) * SMOOTHING_FACTOR;
+                if (smoothedSpeed < 0.3) smoothedSpeed = 0;
+
+                speedEl.innerHTML = `${smoothedSpeed.toFixed(1)} <span class="unit">km/h</span>`;
                 distanceEl.innerHTML = `${distanceKm.toFixed(2)} <span class="unit">km</span>`;
 
-                // অ্যানিমেশন এবং আইকন আপডেট (৬ km/h লজিক)
-                if (speedKmH <= 0.2) {
-                    modeIcon.textContent = '🚶‍♂️';
-                    modeIcon.className = 'mode-animation stopped';
-                } else if (speedKmH <= CAR_SPEED_THRESHOLD) {
-                    modeIcon.textContent = '🚶‍♂️';
-                    modeIcon.className = 'mode-animation walking';
+                if (smoothedSpeed <= 0.3) {
+                    animBox.className = 'anim-container';
+                    animBox.innerHTML = walkerSVG;
+                } else if (smoothedSpeed <= 6.0) {
+                    animBox.className = 'anim-container walking';
+                    animBox.innerHTML = walkerSVG;
                 } else {
-                    modeIcon.textContent = '🚗';
-                    modeIcon.className = 'mode-animation driving';
+                    animBox.className = 'anim-container driving';
+                    animBox.innerHTML = carSVG;
                 }
             }
 
@@ -579,9 +631,8 @@
                 const accuracy = position.coords.accuracy;
                 const currentTime = position.timestamp;
 
-                // দুর্বল সিগন্যাল সম্পূর্ণ বাদ (গুগল ম্যাপ ফিল্টার)
-                if (accuracy > MAX_ACCURACY_THRESHOLD) {
-                    statusText.textContent = '⚠️ সিগন্যাল খোঁজা হচ্ছে... (স্থির)';
+                if (accuracy > 25) {
+                    statusText.textContent = '⚠️ সিগন্যাল খোঁজা হচ্ছে...';
                     statusText.className = 'status-text error';
                     updateUI(0, totalDistance);
                     return;
@@ -598,50 +649,44 @@
                 const distM = calculateDistanceMeters(lastLat, lastLon, lat, lon);
                 const timeS = (currentTime - lastTime) / 1000;
 
-                // স্থির অবস্থায় জিপিএস লাফানো (Drift) প্রতিরোধ
-                if (distM < MIN_REAL_DISTANCE_METERS) {
-                    statusText.textContent = '🅿️ স্থির (স্থগিত)';
-                    statusText.className = 'status-text';
-                    updateUI(0, totalDistance);
-                    return;
-                }
+                let instantSpeed = 0;
 
-                let currentSpeed = 0;
-                if (timeS > 0) {
-                    currentSpeed = (distM / timeS) * 3.6;
-                }
-
-                // সরাসরি ডিভাইসের জিপিএস গতি পরীক্ষা
                 if (position.coords.speed !== null && position.coords.speed >= 0) {
-                    currentSpeed = position.coords.speed * 3.6;
+                    instantSpeed = position.coords.speed * 3.6;
+                } else if (timeS > 0) {
+                    instantSpeed = (distM / timeS) * 3.6;
                 }
 
-                if (currentSpeed < MIN_WALKING_SPEED) {
-                    currentSpeed = 0;
+                if (distM < 1.5 && instantSpeed < 1.0) {
+                    instantSpeed = 0;
                 }
 
-                if (currentSpeed > 0) {
+                if (instantSpeed > 0.4) {
                     totalDistance += (distM / 1000);
+                    
+                    // লোকাল স্টোরেজে দূরত্ব সেভ করা হচ্ছে
+                    localStorage.setItem('speed_tracker_distance', totalDistance.toString());
+
                     lastLat = lat;
                     lastLon = lon;
                     lastTime = currentTime;
 
-                    if (currentSpeed <= CAR_SPEED_THRESHOLD) {
+                    if (instantSpeed <= 6.0) {
                         statusText.textContent = '🚶‍♂️ হাঁটা শনাক্ত হয়েছে';
                     } else {
                         statusText.textContent = '🚗 গাড়ি রানিং রয়েছে';
                     }
                     statusText.className = 'status-text active';
                 } else {
-                    statusText.textContent = '🅿️ স্থির (০.০)';
+                    statusText.textContent = '🅿️ অবস্থান স্থির (০.০)';
                     statusText.className = 'status-text';
                 }
 
-                updateUI(currentSpeed, totalDistance);
+                updateUI(instantSpeed, totalDistance);
             }
 
             function handleError(error) {
-                statusText.textContent = '⚠️ GPS সংকেত অনুপস্থিত';
+                statusText.textContent = '⚠️ GPS সংকেত পাওয়া যাচ্ছে না';
                 statusText.className = 'status-text error';
                 updateUI(0, totalDistance);
             }
@@ -662,8 +707,8 @@
                     handleError,
                     {
                         enableHighAccuracy: true,
-                        maximumAge: 0,
-                        timeout: 3000
+                        maximumAge: 1000,
+                        timeout: 5000
                     }
                 );
 
@@ -680,6 +725,7 @@
                     watchId = null;
                 }
                 isTracking = false;
+                smoothedSpeed = 0;
                 trackBtn.textContent = '▶ শুরু';
                 trackBtn.className = 'btn-track';
                 statusText.textContent = '⏸ ট্র্যাকিং বন্ধ';
@@ -693,6 +739,11 @@
                 lastLat = null;
                 lastLon = null;
                 lastTime = null;
+                smoothedSpeed = 0;
+                
+                // লোকাল স্টোরেজের সেভ ডাটা রিফ্রেশ/রিসেট করা
+                localStorage.removeItem('speed_tracker_distance');
+
                 updateUI(0, 0);
                 statusText.textContent = '🔄 রিসেট সম্পন্ন হয়েছে';
                 statusText.className = 'status-text';
