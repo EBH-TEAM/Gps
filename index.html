@@ -28,8 +28,17 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px 25px 12px; /* Bottom padding keeps content safe from mobile navbar */
+            padding: 10px 12px 20px 12px;
             background: radial-gradient(circle at 50% 30%, #0c1622, #04080c 80%);
+        }
+
+        /* Top Bar Section */
+        .top-section {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .top-bar {
@@ -37,8 +46,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 5px;
-            height: 30px;
+            padding: 0 2px;
+            height: 25px;
         }
 
         .brand-name {
@@ -77,7 +86,6 @@
             box-shadow: 0 0 10px #00e5cc;
         }
 
-        /* Top Reset Button */
         .btn-reset-top {
             background: rgba(255, 255, 255, 0.08);
             color: #a0b2c6;
@@ -96,7 +104,48 @@
             background: rgba(255, 255, 255, 0.25);
         }
 
-        /* Large Gauge Container */
+        /* Stats Panel Moved To The Top Empty Space */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            background: rgba(12, 22, 34, 0.7);
+            border-radius: 10px;
+            padding: 8px 4px;
+            border: 1px solid rgba(0, 229, 204, 0.08);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            margin-top: 2px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-box:last-child {
+            border-right: none;
+        }
+
+        .stat-label {
+            font-size: 9px;
+            color: #5b6e82;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .stat-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffcc00;
+        }
+
+        .stat-value.cyan {
+            color: #00e5cc;
+        }
+
+        /* Gauge Canvas Position Kept 100% Unchanged */
         .gauge-area {
             position: relative;
             width: 100%;
@@ -123,7 +172,6 @@
             filter: drop-shadow(0 0 8px #00e5cc);
         }
 
-        /* Speed Text Positioned Inside Gauge */
         .digital-display {
             position: absolute;
             bottom: 10%;
@@ -147,69 +195,41 @@
             margin-top: 2px;
             font-weight: 700;
         }
-
-        /* Bottom Section */
-        .bottom-section {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stats-panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            background: rgba(12, 22, 34, 0.7);
-            border-radius: 10px;
-            padding: 10px 4px;
-            border: 1px solid rgba(0, 229, 204, 0.08);
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .stat-box {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .stat-box:last-child {
-            border-right: none;
-        }
-
-        .stat-label {
-            font-size: 9px;
-            color: #5b6e82;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        .stat-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: #ffcc00;
-        }
-
-        .stat-value.cyan {
-            color: #00e5cc;
-        }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <div class="top-bar">
-            <div class="brand-name">EBH SPEED METER</div>
-            <div class="top-right-controls">
-                <div class="gps-status">
-                    <div class="gps-dot" id="gpsDot"></div>
-                    <span id="gpsText">GPS OFF</span>
+        <!-- Top Section with Details -->
+        <div class="top-section">
+            <div class="top-bar">
+                <div class="brand-name">EBH SPEED METER</div>
+                <div class="top-right-controls">
+                    <div class="gps-status">
+                        <div class="gps-dot" id="gpsDot"></div>
+                        <span id="gpsText">GPS OFF</span>
+                    </div>
+                    <button class="btn-reset-top" id="resetBtn">RESET</button>
                 </div>
-                <button class="btn-reset-top" id="resetBtn">RESET</button>
+            </div>
+
+            <div class="stats-panel">
+                <div class="stat-box">
+                    <div class="stat-label">AVG</div>
+                    <div class="stat-value" id="avgSpeed">0.0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">MAX</div>
+                    <div class="stat-value" id="maxSpeed">0.0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">TRIP</div>
+                    <div class="stat-value cyan" id="tripDist">0.00</div>
+                </div>
             </div>
         </div>
 
+        <!-- Meter Gauge Base Unchanged -->
         <div class="gauge-area">
             <svg class="gauge-svg" viewBox="10 10 280 230">
                 <defs>
@@ -244,23 +264,6 @@
             <div class="digital-display">
                 <div class="speed-number" id="speedText">0.0</div>
                 <div class="unit">KM / H</div>
-            </div>
-        </div>
-
-        <div class="bottom-section">
-            <div class="stats-panel">
-                <div class="stat-box">
-                    <div class="stat-label">AVG</div>
-                    <div class="stat-value" id="avgSpeed">0.0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">MAX</div>
-                    <div class="stat-value" id="maxSpeed">0.0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">TRIP</div>
-                    <div class="stat-value cyan" id="tripDist">0.00</div>
-                </div>
             </div>
         </div>
     </div>
@@ -407,7 +410,6 @@
                 gpsText.textContent = 'SEARCHING';
             }
 
-            // Auto-start GPS function
             function startAutoTracking() {
                 if (!("geolocation" in navigator)) {
                     alert("GPS not supported.");
@@ -442,7 +444,6 @@
 
             resetBtn.addEventListener('click', resetAll);
 
-            // Trigger auto-start when loaded
             startAutoTracking();
 
         })();
