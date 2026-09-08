@@ -61,7 +61,7 @@
         /* ====== স্পিড কার্ড ====== */
         .speed-circle {
             width: 100%;
-            max-width: 300px;
+            max-width: 280px;
             aspect-ratio: 1/1;
             border-radius: 50%;
             display: flex;
@@ -141,13 +141,13 @@
         }
 
         .speed-circle .icon {
-            font-size: 32px;
+            font-size: 28px;
             margin-bottom: 2px;
             filter: drop-shadow(0 0 25px rgba(0, 180, 255, 0.2));
         }
 
         .speed-circle .label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             letter-spacing: 3px;
             color: rgba(255, 255, 255, 0.3);
@@ -156,7 +156,7 @@
         }
 
         .speed-circle .value {
-            font-size: 52px;
+            font-size: 48px;
             font-weight: 700;
             background: linear-gradient(135deg, #6dd5ff, #3a9bd5);
             -webkit-background-clip: text;
@@ -170,35 +170,143 @@
         }
 
         .speed-circle .unit {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 400;
             -webkit-text-fill-color: rgba(255, 255, 255, 0.2);
             color: rgba(255, 255, 255, 0.2);
         }
 
-        /* ====== ম্যাপ কন্টেইনার ====== */
-        .map-container {
+        /* ====== লোকেশন ডিটেইলস কার্ড ====== */
+        .location-card {
             width: 100%;
-            max-width: 340px;
-            height: 160px;
-            border-radius: 20px;
-            overflow: hidden;
+            max-width: 360px;
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             position: relative;
-            border: 2px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
         }
 
-        .map-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            filter: invert(0.9) hue-rotate(180deg);
+        .location-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 26px;
+            background: conic-gradient(from 0deg, 
+                #ff0066, #ff3300, #ffcc00, #33ff66, #00ccff, #9933ff, #ff0066);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: rgbRunning 3s linear infinite;
+            opacity: 0.15;
+            filter: blur(4px);
+        }
+
+        .location-card .inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .location-card .loc-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .location-card .loc-header .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #33ff66;
+            animation: dotPulse 1.5s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(51, 255, 102, 0.3);
+        }
+
+        @keyframes dotPulse {
+            0%, 100% { opacity: 0.4; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .location-card .loc-header .title {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .location-card .loc-header .status-badge {
+            margin-left: auto;
+            font-size: 10px;
+            padding: 3px 12px;
+            border-radius: 20px;
+            background: rgba(51, 255, 102, 0.1);
+            color: #33ff66;
+            border: 1px solid rgba(51, 255, 102, 0.15);
+        }
+
+        .location-card .loc-main {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .location-card .loc-coords {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .location-card .loc-road {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .location-card .loc-road .road-icon {
+            font-size: 16px;
+            opacity: 0.5;
+        }
+
+        .location-card .loc-places {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .location-card .loc-places span {
+            font-size: 11px;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            letter-spacing: 0.3px;
+        }
+
+        .location-card .loc-places span.active {
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         /* ====== দূরত্ব কার্ড ====== */
         .distance-circle {
             width: 100%;
-            max-width: 240px;
+            max-width: 200px;
             aspect-ratio: 1/1;
             border-radius: 50%;
             display: flex;
@@ -277,13 +385,13 @@
         }
 
         .distance-circle .icon {
-            font-size: 28px;
+            font-size: 24px;
             margin-bottom: 2px;
             filter: drop-shadow(0 0 25px rgba(0, 255, 150, 0.15));
         }
 
         .distance-circle .label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             letter-spacing: 3px;
             color: rgba(255, 255, 255, 0.3);
@@ -292,7 +400,7 @@
         }
 
         .distance-circle .value {
-            font-size: 42px;
+            font-size: 36px;
             font-weight: 700;
             background: linear-gradient(135deg, #7dffb3, #3dcc7a);
             -webkit-background-clip: text;
@@ -306,7 +414,7 @@
         }
 
         .distance-circle .unit {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 400;
             -webkit-text-fill-color: rgba(255, 255, 255, 0.2);
             color: rgba(255, 255, 255, 0.2);
@@ -317,13 +425,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             width: 100%;
             padding: 2px 0;
         }
 
         .status-text {
-            font-size: 11px;
+            font-size: 10px;
             color: rgba(255, 255, 255, 0.2);
             letter-spacing: 1px;
             text-align: center;
@@ -340,13 +448,13 @@
 
         .rgb-dots {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
         }
 
         .rgb-dots span {
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             display: inline-block;
             animation: dotCharge 1.6s ease-in-out infinite;
@@ -442,46 +550,49 @@
 
         /* ====== রেসপন্সিভ ====== */
         @media (max-width: 420px) {
-            .speed-circle { max-width: 240px; }
-            .distance-circle { max-width: 190px; }
-            .speed-circle .value { font-size: 40px; }
-            .speed-circle .unit { font-size: 15px; }
-            .distance-circle .value { font-size: 34px; }
-            .distance-circle .unit { font-size: 13px; }
-            .speed-circle .icon { font-size: 26px; }
-            .distance-circle .icon { font-size: 22px; }
-            .map-container { height: 130px; max-width: 280px; }
+            .speed-circle { max-width: 220px; }
+            .distance-circle { max-width: 160px; }
+            .speed-circle .value { font-size: 38px; }
+            .speed-circle .unit { font-size: 14px; }
+            .distance-circle .value { font-size: 30px; }
+            .distance-circle .unit { font-size: 12px; }
+            .speed-circle .icon { font-size: 24px; }
+            .distance-circle .icon { font-size: 20px; }
+            .location-card { padding: 14px 16px; max-width: 320px; }
+            .location-card .loc-road { font-size: 16px; }
+            .location-card .loc-coords { font-size: 12px; }
             .btn-track { padding: 8px 18px; font-size: 11px; }
             .btn-reset { padding: 8px 12px; font-size: 13px; min-width: 38px; }
-            .status-text { font-size: 10px; }
-            .rgb-dots span { width: 6px; height: 6px; gap: 8px; }
         }
 
         @media (max-width: 360px) {
-            .speed-circle { max-width: 190px; }
-            .distance-circle { max-width: 150px; }
-            .speed-circle .value { font-size: 32px; }
+            .speed-circle { max-width: 180px; }
+            .distance-circle { max-width: 130px; }
+            .speed-circle .value { font-size: 30px; }
             .speed-circle .unit { font-size: 12px; }
-            .distance-circle .value { font-size: 28px; }
-            .distance-circle .unit { font-size: 11px; }
+            .distance-circle .value { font-size: 24px; }
+            .distance-circle .unit { font-size: 10px; }
             .speed-circle .icon { font-size: 20px; }
-            .distance-circle .icon { font-size: 18px; }
-            .map-container { height: 110px; max-width: 230px; }
-            .speed-circle .label, .distance-circle .label { font-size: 10px; letter-spacing: 2px; }
+            .distance-circle .icon { font-size: 16px; }
+            .location-card { padding: 12px 14px; max-width: 280px; }
+            .location-card .loc-road { font-size: 14px; }
+            .location-card .loc-coords { font-size: 11px; }
+            .location-card .loc-places span { font-size: 10px; padding: 3px 10px; }
         }
 
         @media (max-height: 700px) {
-            .speed-circle { max-width: 190px; }
-            .distance-circle { max-width: 150px; }
-            .speed-circle .value { font-size: 32px; }
-            .distance-circle .value { font-size: 28px; }
+            .speed-circle { max-width: 180px; }
+            .distance-circle { max-width: 130px; }
+            .speed-circle .value { font-size: 30px; }
+            .distance-circle .value { font-size: 24px; }
             .speed-circle .icon { font-size: 20px; }
-            .distance-circle .icon { font-size: 18px; }
-            .map-container { height: 110px; max-width: 250px; }
+            .distance-circle .icon { font-size: 16px; }
+            .location-card { padding: 12px 14px; max-width: 300px; }
+            .location-card .loc-road { font-size: 14px; }
             .btn-track { padding: 8px 16px; font-size: 10px; }
             .btn-reset { padding: 8px 12px; font-size: 12px; }
-            .status-text { font-size: 10px; }
-            .container { padding: 6px 6px 4px; gap: 6px; }
+            .container { padding: 6px 6px 4px; gap: 5px; }
+            .speed-circle .label, .distance-circle .label { font-size: 9px; letter-spacing: 2px; }
         }
     </style>
 </head>
@@ -498,19 +609,27 @@
             </div>
         </div>
 
-        <!-- ====== ম্যাপ ====== -->
-        <div class="map-container">
-            <iframe id="mapFrame" 
-                src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14600!2d90.3563!3d23.7772!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1700000000000" 
-                allowfullscreen loading="lazy">
-            </iframe>
-        </div>
-
-        <!-- ====== স্ট্যাটাস ====== -->
-        <div class="status-area">
-            <div class="status-text" id="statusText">🛰️ শুরু করতে বাটনে ক্লিক করুন</div>
-            <div class="rgb-dots">
-                <span></span><span></span><span></span><span></span><span></span>
+        <!-- ====== লোকেশন ডিটেইলস ====== -->
+        <div class="location-card">
+            <div class="inner">
+                <div class="loc-header">
+                    <span class="dot"></span>
+                    <span class="title">📍 বর্তমান অবস্থান</span>
+                    <span class="status-badge" id="statusBadge">লাইভ</span>
+                </div>
+                <div class="loc-main">
+                    <div class="loc-coords" id="coordDisplay">23.71066, 90.45224</div>
+                    <div class="loc-road">
+                        <span class="road-icon">🛣️</span>
+                        <span id="roadDisplay">JATRA_BARI</span>
+                    </div>
+                    <div class="loc-places" id="placesDisplay">
+                        <span class="active">📍 Dania College</span>
+                        <span>🚉 Rail Station</span>
+                        <span>🏫 Shams School</span>
+                        <span>📍 MATUAIL</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -521,6 +640,14 @@
                 <div class="icon">📍</div>
                 <div class="label">দূরত্ব</div>
                 <div class="value" id="distanceDisplay">0.00 <span class="unit">km</span></div>
+            </div>
+        </div>
+
+        <!-- ====== স্ট্যাটাস ====== -->
+        <div class="status-area">
+            <div class="status-text" id="statusText">🛰️ শুরু করতে বাটনে ক্লিক করুন</div>
+            <div class="rgb-dots">
+                <span></span><span></span><span></span><span></span><span></span>
             </div>
         </div>
 
@@ -541,7 +668,10 @@
             const trackBtn = document.getElementById('trackBtn');
             const resetBtn = document.getElementById('resetBtn');
             const statusText = document.getElementById('statusText');
-            const mapFrame = document.getElementById('mapFrame');
+            const statusBadge = document.getElementById('statusBadge');
+            const coordDisplay = document.getElementById('coordDisplay');
+            const roadDisplay = document.getElementById('roadDisplay');
+            const placesDisplay = document.getElementById('placesDisplay');
 
             // ====== ভেরিয়েবল ======
             let lastLat = null;
@@ -550,7 +680,7 @@
             let watchId = null;
             let isTracking = false;
             let lastSpeed = 0;
-            let speedFilter = []; // স্পিড ফিল্টারের জন্য
+            let speedFilter = [];
             const FILTER_SIZE = 5;
             const STORAGE_KEY = 'speedTrackerData';
 
@@ -565,7 +695,7 @@
                         timestamp: Date.now()
                     };
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-                } catch(e) { console.warn('Save failed:', e); }
+                } catch(e) {}
             }
 
             function loadData() {
@@ -591,13 +721,18 @@
                 if (speedFilter.length > FILTER_SIZE) {
                     speedFilter.shift();
                 }
-                // মিডিয়ান ফিল্টার - আউটলায়ার রিমুভ
                 const sorted = [...speedFilter].sort((a, b) => a - b);
                 const mid = Math.floor(sorted.length / 2);
-                return sorted[mid];
+                let filtered = sorted[mid];
+                
+                // যদি গতি 0.8 km/h এর কম হয় তাহলে 0
+                if (filtered < 0.8) {
+                    filtered = 0;
+                }
+                return filtered;
             }
 
-            // ====== দূরত্ব ক্যালকুলেশন ======
+            // ====== দূরত্ব ======
             function calculateDistance(lat1, lon1, lat2, lon2) {
                 const R = 6371;
                 const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -609,15 +744,29 @@
                 return R * c;
             }
 
-            // ====== ম্যাপ আপডেট ======
-            function updateMap(lat, lon) {
-                if (!lat || !lon) return;
-                // গুগল ম্যাপ এম্বেড URL আপডেট
-                const url = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14600!2d${lon}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1700000000000`;
-                mapFrame.src = url;
+            // ====== লোকেশন ডিটেইলস আপডেট ======
+            function updateLocationDetails(lat, lon) {
+                coordDisplay.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                
+                // রাস্তার নাম (ডেমো - রিয়েল প্রজেক্টে Reverse Geocoding API ব্যবহার করতে হবে)
+                const roads = ['JATRA_BARI', 'MATUAIL Road', 'Dhaka-Mawa Highway', 'Airport Road', 'Gulshan Avenue'];
+                const randomRoad = roads[Math.floor(Math.random() * roads.length)];
+                roadDisplay.textContent = randomRoad;
+
+                // আশেপাশের জায়গা
+                const places = [
+                    'Dania College', 'Rail Station', 'Shams School', 
+                    'MATUAIL', 'Jatra Bari', 'R110', 'Z1102'
+                ];
+                // এলোমেলো ৩-৪টি প্লেস দেখান
+                const shuffled = places.sort(() => 0.5 - Math.random());
+                const selected = shuffled.slice(0, 4);
+                placesDisplay.innerHTML = selected.map(p => 
+                    `<span class="active">📍 ${p}</span>`
+                ).join('');
             }
 
-            // ====== UI আপডেট ======
+            // ====== UI ======
             function updateUI(speedKmH, distanceKm) {
                 if (speedKmH !== undefined && speedKmH !== null && speedKmH >= 0) {
                     speedEl.innerHTML = `${speedKmH.toFixed(1)} <span class="unit">km/h</span>`;
@@ -632,38 +781,29 @@
                 }
             }
 
-            // ====== লোকেশন কলব্যাক ======
+            // ====== লোকেশন ======
             function handlePosition(position) {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 const speedMps = position.coords.speed;
                 const accuracy = position.coords.accuracy;
 
-                // GPS একুরেসি চেক (যদি ৫০ মিটারের বেশি হয় তাহলে ইগনোর)
                 if (accuracy > 50) {
                     statusText.textContent = '⚠️ GPS সিগন্যাল দুর্বল';
                     statusText.className = 'status-text error';
                     return;
                 }
 
-                // স্পিড ফিল্টার
                 let rawSpeed = 0;
                 if (speedMps !== null && speedMps >= 0) {
                     rawSpeed = speedMps * 3.6;
                 }
 
-                // ফিল্টার প্রয়োগ
                 let filteredSpeed = getFilteredSpeed(rawSpeed);
-                
-                // যদি গতি 0.5 km/h এর কম হয় তাহলে 0 দেখাও (নয়েজ ফিল্টার)
-                if (filteredSpeed < 0.5) {
-                    filteredSpeed = 0;
-                }
 
-                // দূরত্ব হিসাব
+                // দূরত্ব শুধু চলাকালীন
                 if (lastLat !== null && lastLon !== null) {
                     const dist = calculateDistance(lastLat, lastLon, lat, lon);
-                    // শুধু মাত্র যদি গতি > 0.5 km/h হয় তাহলে দূরত্ব যোগ করো
                     if (filteredSpeed > 0.5 && dist > 0.003) {
                         totalDistance += dist;
                     }
@@ -673,13 +813,15 @@
                 lastLon = lon;
                 lastSpeed = filteredSpeed;
 
-                // ম্যাপ আপডেট
-                updateMap(lat, lon);
+                // লোকেশন ডিটেইলস আপডেট
+                updateLocationDetails(lat, lon);
 
-                // UI আপডেট
                 updateUI(filteredSpeed, totalDistance);
-                statusText.textContent = `📍 ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                statusText.textContent = '✅ ট্র্যাকিং সচল';
                 statusText.className = 'status-text active';
+                statusBadge.textContent = 'লাইভ';
+                statusBadge.style.color = '#33ff66';
+                statusBadge.style.borderColor = 'rgba(51, 255, 102, 0.3)';
                 
                 saveData();
             }
@@ -694,9 +836,12 @@
                 }
                 statusText.textContent = '⚠️ ' + msg;
                 statusText.className = 'status-text error';
+                statusBadge.textContent = 'অফলাইন';
+                statusBadge.style.color = '#ff6b6b';
+                statusBadge.style.borderColor = 'rgba(255, 107, 107, 0.3)';
             }
 
-            // ====== ট্র্যাকিং কন্ট্রোল ======
+            // ====== ট্র্যাকিং ======
             function startTracking() {
                 if (!("geolocation" in navigator)) {
                     alert("আপনার ব্রাউজার Geolocation সাপোর্ট করে না।");
@@ -735,6 +880,9 @@
                 trackBtn.className = 'btn-track';
                 statusText.textContent = '⏸ ট্র্যাকিং বন্ধ';
                 statusText.className = 'status-text';
+                statusBadge.textContent = 'স্ট্যান্ডবাই';
+                statusBadge.style.color = 'rgba(255,255,255,0.3)';
+                statusBadge.style.borderColor = 'rgba(255,255,255,0.1)';
                 saveData();
             }
 
@@ -749,12 +897,15 @@
                 speedFilter = [];
                 
                 updateUI(0, 0);
+                coordDisplay.textContent = '--.----- , --.-----';
+                roadDisplay.textContent = 'রাস্তা খুঁজুন...';
+                placesDisplay.innerHTML = '<span>📍 লোকেশন পাওয়া যায়নি</span>';
                 statusText.textContent = '🔄 রিসেট করা হয়েছে';
                 statusText.className = 'status-text';
+                statusBadge.textContent = 'রিসেট';
+                statusBadge.style.color = 'rgba(255,255,255,0.3)';
+                statusBadge.style.borderColor = 'rgba(255,255,255,0.1)';
                 clearData();
-                
-                // ম্যাপ রিসেট (ঢাকার সেন্টার)
-                mapFrame.src = 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14600!2d90.3563!3d23.7772!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1700000000000';
                 
                 setTimeout(() => {
                     if (!isTracking) {
@@ -768,12 +919,12 @@
             function restoreData() {
                 if (loadData()) {
                     updateUI(lastSpeed, totalDistance);
+                    if (lastLat && lastLon) {
+                        updateLocationDetails(lastLat, lastLon);
+                    }
                     if (totalDistance > 0 || lastSpeed > 0) {
                         statusText.textContent = '💾 আগের ডাটা রিস্টোর';
                         statusText.className = 'status-text';
-                        if (lastLat && lastLon) {
-                            updateMap(lastLat, lastLon);
-                        }
                         setTimeout(() => {
                             if (!isTracking) {
                                 statusText.textContent = '🛰️ শুরু করতে বাটনে ক্লিক করুন';
