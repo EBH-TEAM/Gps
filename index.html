@@ -24,6 +24,7 @@
             position: relative;
         }
 
+        /* ====== পটভূমির এনিমেটেড ইফেক্ট ====== */
         body::before {
             content: '';
             position: fixed;
@@ -32,16 +33,45 @@
             width: 200%;
             height: 200%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(255,0,102,0.04), transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0,102,255,0.04), transparent 50%);
-            animation: bgPulse 8s ease-in-out infinite alternate;
+                radial-gradient(circle at 20% 80%, rgba(255,0,102,0.06), transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(0,102,255,0.06), transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255,204,0,0.03), transparent 60%);
+            animation: bgMove 12s ease-in-out infinite alternate;
             z-index: 0;
             pointer-events: none;
         }
 
-        @keyframes bgPulse {
-            0% { transform: scale(1) rotate(0deg); opacity: 0.5; }
-            100% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+        @keyframes bgMove {
+            0% { transform: scale(1) rotate(0deg) translate(0, 0); }
+            33% { transform: scale(1.1) rotate(120deg) translate(5%, 5%); }
+            66% { transform: scale(0.9) rotate(240deg) translate(-5%, -5%); }
+            100% { transform: scale(1.05) rotate(360deg) translate(0, 0); }
+        }
+
+        /* ফ্লোটিং পার্টিকেল */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            animation: float linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
         }
 
         .container {
@@ -52,16 +82,16 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px 8px 8px;
+            padding: 12px 8px 6px;
             position: relative;
             z-index: 1;
-            gap: 8px;
+            gap: 6px;
         }
 
-        /* ====== স্পিড কার্ড ====== */
-        .speed-circle {
+        /* ====== উপরের স্পিড কার্ড ====== */
+        .circle-card {
             width: 100%;
-            max-width: 280px;
+            max-width: 320px;
             aspect-ratio: 1/1;
             border-radius: 50%;
             display: flex;
@@ -69,54 +99,70 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            background: radial-gradient(circle at 30% 30%, #141e33, #080e1a);
             transition: transform 0.3s ease;
-            margin-top: 2px;
         }
 
-        .speed-circle::before {
+        .circle-card .inner-bg {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .circle-card .content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* স্পিড কার্ড */
+        .speed-card {
+            background: radial-gradient(circle at 30% 30%, #141e33, #080e1a);
+        }
+
+        .speed-card .inner-bg {
+            background: radial-gradient(circle at 30% 30%, #141e33, #080e1a);
+        }
+
+        .speed-card::before {
             content: '';
             position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
             border-radius: 50%;
             background: conic-gradient(from var(--angle, 0deg), 
                 #ff0066, #ff3300, #ffcc00, #33ff66, #00ccff, #9933ff, #ff0066);
             background-size: 300% 300%;
             z-index: -1;
             animation: rgbRunning 2s linear infinite;
-            filter: blur(3px);
+            filter: blur(4px);
             opacity: 0.7;
         }
 
-        .speed-circle::after {
+        .speed-card::after {
             content: '';
             position: absolute;
-            top: -3px;
-            left: -3px;
-            right: -3px;
-            bottom: -3px;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
             border-radius: 50%;
             background: conic-gradient(from var(--angle, 0deg), 
                 #ff0066, #ff3300, #ffcc00, #33ff66, #00ccff, #9933ff, #ff0066);
             background-size: 300% 300%;
             z-index: -1;
             animation: rgbRunning 2s linear infinite;
-            filter: blur(8px);
-            opacity: 0.3;
-        }
-
-        .speed-circle .inner-bg {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            right: 4px;
-            bottom: 4px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #141e33, #080e1a);
-            z-index: 0;
+            filter: blur(12px);
+            opacity: 0.25;
         }
 
         @property --angle {
@@ -130,33 +176,23 @@
             100% { --angle: 360deg; background-position: 100% 50%; }
         }
 
-        .speed-circle .content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-        }
-
-        .speed-circle .icon {
-            font-size: 28px;
+        .speed-card .icon {
+            font-size: 32px;
             margin-bottom: 2px;
-            filter: drop-shadow(0 0 25px rgba(0, 180, 255, 0.2));
+            filter: drop-shadow(0 0 30px rgba(0, 180, 255, 0.15));
         }
 
-        .speed-circle .label {
-            font-size: 11px;
+        .speed-card .label {
+            font-size: 12px;
             font-weight: 600;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             color: rgba(255, 255, 255, 0.3);
             text-transform: uppercase;
             margin-bottom: 2px;
         }
 
-        .speed-circle .value {
-            font-size: 48px;
+        .speed-card .value {
+            font-size: 56px;
             font-weight: 700;
             background: linear-gradient(135deg, #6dd5ff, #3a9bd5);
             -webkit-background-clip: text;
@@ -164,203 +200,59 @@
             background-clip: text;
             display: flex;
             align-items: baseline;
-            gap: 3px;
+            gap: 4px;
             line-height: 1;
-            text-shadow: 0 0 60px rgba(0, 180, 255, 0.1);
+            text-shadow: 0 0 80px rgba(0, 180, 255, 0.1);
         }
 
-        .speed-circle .unit {
-            font-size: 16px;
+        .speed-card .unit {
+            font-size: 18px;
             font-weight: 400;
             -webkit-text-fill-color: rgba(255, 255, 255, 0.2);
             color: rgba(255, 255, 255, 0.2);
         }
 
-        /* ====== লোকেশন ডিটেইলস কার্ড ====== */
-        .location-card {
-            width: 100%;
-            max-width: 360px;
-            padding: 16px 18px;
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .location-card::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border-radius: 26px;
-            background: conic-gradient(from 0deg, 
-                #ff0066, #ff3300, #ffcc00, #33ff66, #00ccff, #9933ff, #ff0066);
-            background-size: 300% 300%;
-            z-index: -1;
-            animation: rgbRunning 3s linear infinite;
-            opacity: 0.15;
-            filter: blur(4px);
-        }
-
-        .location-card .inner {
-            position: relative;
-            z-index: 1;
-        }
-
-        .location-card .loc-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .location-card .loc-header .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #33ff66;
-            animation: dotPulse 1.5s ease-in-out infinite;
-            box-shadow: 0 0 20px rgba(51, 255, 102, 0.3);
-        }
-
-        @keyframes dotPulse {
-            0%, 100% { opacity: 0.4; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        .location-card .loc-header .title {
-            font-size: 13px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.4);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .location-card .loc-header .status-badge {
-            margin-left: auto;
-            font-size: 10px;
-            padding: 3px 12px;
-            border-radius: 20px;
-            background: rgba(51, 255, 102, 0.1);
-            color: #33ff66;
-            border: 1px solid rgba(51, 255, 102, 0.15);
-        }
-
-        .location-card .loc-main {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .location-card .loc-coords {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 400;
-            letter-spacing: 0.5px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .location-card .loc-road {
-            font-size: 18px;
-            font-weight: 600;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .location-card .loc-road .road-icon {
-            font-size: 16px;
-            opacity: 0.5;
-        }
-
-        .location-card .loc-places {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        .location-card .loc-places span {
-            font-size: 11px;
-            padding: 4px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            color: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            letter-spacing: 0.3px;
-        }
-
-        .location-card .loc-places span.active {
-            color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        /* ====== দূরত্ব কার্ড ====== */
-        .distance-circle {
-            width: 100%;
-            max-width: 200px;
-            aspect-ratio: 1/1;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+        /* ====== নিচের দূরত্ব কার্ড ====== */
+        .distance-card {
             background: radial-gradient(circle at 30% 30%, #1a2e22, #0a1410);
-            transition: transform 0.3s ease;
         }
 
-        .distance-circle::before {
+        .distance-card .inner-bg {
+            background: radial-gradient(circle at 30% 30%, #1a2e22, #0a1410);
+        }
+
+        .distance-card::before {
             content: '';
             position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
             border-radius: 50%;
             background: conic-gradient(from var(--angle2, 180deg), 
                 #9933ff, #0066ff, #00ccff, #33ff66, #ffcc00, #ff3300, #ff0066, #9933ff);
             background-size: 300% 300%;
             z-index: -1;
             animation: rgbRunning2 2.5s linear infinite;
-            filter: blur(3px);
+            filter: blur(4px);
             opacity: 0.6;
         }
 
-        .distance-circle::after {
+        .distance-card::after {
             content: '';
             position: absolute;
-            top: -3px;
-            left: -3px;
-            right: -3px;
-            bottom: -3px;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
             border-radius: 50%;
             background: conic-gradient(from var(--angle2, 180deg), 
                 #9933ff, #0066ff, #00ccff, #33ff66, #ffcc00, #ff3300, #ff0066, #9933ff);
             background-size: 300% 300%;
             z-index: -1;
             animation: rgbRunning2 2.5s linear infinite;
-            filter: blur(8px);
-            opacity: 0.25;
-        }
-
-        .distance-circle .inner-bg {
-            position: absolute;
-            top: 4px;
-            left: 4px;
-            right: 4px;
-            bottom: 4px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #1a2e22, #0a1410);
-            z-index: 0;
+            filter: blur(12px);
+            opacity: 0.2;
         }
 
         @property --angle2 {
@@ -374,33 +266,23 @@
             100% { --angle2: 540deg; background-position: 100% 50%; }
         }
 
-        .distance-circle .content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-        }
-
-        .distance-circle .icon {
-            font-size: 24px;
+        .distance-card .icon {
+            font-size: 28px;
             margin-bottom: 2px;
-            filter: drop-shadow(0 0 25px rgba(0, 255, 150, 0.15));
+            filter: drop-shadow(0 0 30px rgba(0, 255, 150, 0.12));
         }
 
-        .distance-circle .label {
-            font-size: 10px;
+        .distance-card .label {
+            font-size: 12px;
             font-weight: 600;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             color: rgba(255, 255, 255, 0.3);
             text-transform: uppercase;
             margin-bottom: 2px;
         }
 
-        .distance-circle .value {
-            font-size: 36px;
+        .distance-card .value {
+            font-size: 48px;
             font-weight: 700;
             background: linear-gradient(135deg, #7dffb3, #3dcc7a);
             -webkit-background-clip: text;
@@ -408,16 +290,88 @@
             background-clip: text;
             display: flex;
             align-items: baseline;
-            gap: 3px;
+            gap: 4px;
             line-height: 1;
-            text-shadow: 0 0 60px rgba(0, 255, 150, 0.08);
+            text-shadow: 0 0 80px rgba(0, 255, 150, 0.06);
         }
 
-        .distance-circle .unit {
-            font-size: 13px;
+        .distance-card .unit {
+            font-size: 16px;
             font-weight: 400;
             -webkit-text-fill-color: rgba(255, 255, 255, 0.2);
             color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ====== ম্যাপ কন্টেইনার ====== */
+        .map-container {
+            width: 100%;
+            max-width: 360px;
+            height: 180px;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            background: #0a0e17;
+        }
+
+        .map-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 26px;
+            background: conic-gradient(from 0deg, 
+                #ff0066, #ff3300, #ffcc00, #33ff66, #00ccff, #9933ff, #ff0066);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: rgbRunning 3s linear infinite;
+            opacity: 0.2;
+            filter: blur(6px);
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            filter: invert(0.9) hue-rotate(180deg) brightness(0.8);
+        }
+
+        /* ম্যাপের ওপরে লোকেশন মার্কার */
+        .map-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .map-overlay .marker {
+            font-size: 40px;
+            filter: drop-shadow(0 0 20px rgba(255, 50, 50, 0.8));
+            animation: markerPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes markerPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+        }
+
+        .map-overlay .speed-badge {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 4px 14px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
         }
 
         /* ====== স্ট্যাটাস ====== */
@@ -480,11 +434,12 @@
             max-width: 340px;
             justify-content: center;
             align-items: center;
+            margin-top: 2px;
         }
 
         .btn-track {
-            padding: 10px 25px;
-            font-size: 12px;
+            padding: 8px 20px;
+            font-size: 11px;
             font-weight: 600;
             background: linear-gradient(135deg, #00b4db, #0083b0);
             border: none;
@@ -499,6 +454,7 @@
             flex: 1;
             position: relative;
             overflow: hidden;
+            min-height: 40px;
         }
 
         .btn-track::before {
@@ -525,8 +481,8 @@
         .btn-track.stop { background: linear-gradient(135deg, #f09819, #d35400); }
 
         .btn-reset {
-            padding: 10px 15px;
-            font-size: 15px;
+            padding: 8px 12px;
+            font-size: 14px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 50px;
@@ -537,7 +493,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 44px;
+            min-width: 40px;
+            min-height: 40px;
         }
 
         .btn-reset:hover {
@@ -550,57 +507,55 @@
 
         /* ====== রেসপন্সিভ ====== */
         @media (max-width: 420px) {
-            .speed-circle { max-width: 220px; }
-            .distance-circle { max-width: 160px; }
-            .speed-circle .value { font-size: 38px; }
-            .speed-circle .unit { font-size: 14px; }
-            .distance-circle .value { font-size: 30px; }
-            .distance-circle .unit { font-size: 12px; }
-            .speed-circle .icon { font-size: 24px; }
-            .distance-circle .icon { font-size: 20px; }
-            .location-card { padding: 14px 16px; max-width: 320px; }
-            .location-card .loc-road { font-size: 16px; }
-            .location-card .loc-coords { font-size: 12px; }
-            .btn-track { padding: 8px 18px; font-size: 11px; }
-            .btn-reset { padding: 8px 12px; font-size: 13px; min-width: 38px; }
+            .circle-card { max-width: 260px; }
+            .speed-card .value { font-size: 44px; }
+            .speed-card .unit { font-size: 15px; }
+            .distance-card .value { font-size: 38px; }
+            .distance-card .unit { font-size: 13px; }
+            .map-container { height: 150px; max-width: 320px; }
+            .btn-track { padding: 8px 16px; font-size: 10px; min-height: 36px; }
+            .btn-reset { padding: 8px 10px; font-size: 12px; min-height: 36px; min-width: 36px; }
+            .speed-card .icon { font-size: 26px; }
+            .distance-card .icon { font-size: 22px; }
+            .map-overlay .marker { font-size: 32px; }
         }
 
         @media (max-width: 360px) {
-            .speed-circle { max-width: 180px; }
-            .distance-circle { max-width: 130px; }
-            .speed-circle .value { font-size: 30px; }
-            .speed-circle .unit { font-size: 12px; }
-            .distance-circle .value { font-size: 24px; }
-            .distance-circle .unit { font-size: 10px; }
-            .speed-circle .icon { font-size: 20px; }
-            .distance-circle .icon { font-size: 16px; }
-            .location-card { padding: 12px 14px; max-width: 280px; }
-            .location-card .loc-road { font-size: 14px; }
-            .location-card .loc-coords { font-size: 11px; }
-            .location-card .loc-places span { font-size: 10px; padding: 3px 10px; }
+            .circle-card { max-width: 200px; }
+            .speed-card .value { font-size: 34px; }
+            .speed-card .unit { font-size: 12px; }
+            .distance-card .value { font-size: 28px; }
+            .distance-card .unit { font-size: 11px; }
+            .speed-card .icon { font-size: 20px; }
+            .distance-card .icon { font-size: 18px; }
+            .map-container { height: 120px; max-width: 260px; }
+            .speed-card .label, .distance-card .label { font-size: 10px; letter-spacing: 2px; }
+            .map-overlay .marker { font-size: 26px; }
         }
 
         @media (max-height: 700px) {
-            .speed-circle { max-width: 180px; }
-            .distance-circle { max-width: 130px; }
-            .speed-circle .value { font-size: 30px; }
-            .distance-circle .value { font-size: 24px; }
-            .speed-circle .icon { font-size: 20px; }
-            .distance-circle .icon { font-size: 16px; }
-            .location-card { padding: 12px 14px; max-width: 300px; }
-            .location-card .loc-road { font-size: 14px; }
-            .btn-track { padding: 8px 16px; font-size: 10px; }
-            .btn-reset { padding: 8px 12px; font-size: 12px; }
-            .container { padding: 6px 6px 4px; gap: 5px; }
-            .speed-circle .label, .distance-circle .label { font-size: 9px; letter-spacing: 2px; }
+            .circle-card { max-width: 200px; }
+            .speed-card .value { font-size: 34px; }
+            .distance-card .value { font-size: 28px; }
+            .speed-card .icon { font-size: 20px; }
+            .distance-card .icon { font-size: 18px; }
+            .map-container { height: 120px; max-width: 280px; }
+            .btn-track { padding: 6px 14px; font-size: 10px; min-height: 32px; }
+            .btn-reset { padding: 6px 10px; font-size: 12px; min-height: 32px; min-width: 32px; }
+            .container { padding: 8px 6px 4px; gap: 4px; }
+            .speed-card .label, .distance-card .label { font-size: 10px; letter-spacing: 2px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- ====== ফ্লোটিং পার্টিকেল ====== -->
+    <div class="particles" id="particles"></div>
+
     <div class="container">
 
-        <!-- ====== স্পিড ====== -->
-        <div class="speed-circle">
+        <!-- ====== স্পিড কার্ড ====== -->
+        <div class="circle-card speed-card">
             <div class="inner-bg"></div>
             <div class="content">
                 <div class="icon">🚀</div>
@@ -609,32 +564,20 @@
             </div>
         </div>
 
-        <!-- ====== লোকেশন ডিটেইলস ====== -->
-        <div class="location-card">
-            <div class="inner">
-                <div class="loc-header">
-                    <span class="dot"></span>
-                    <span class="title">📍 বর্তমান অবস্থান</span>
-                    <span class="status-badge" id="statusBadge">লাইভ</span>
-                </div>
-                <div class="loc-main">
-                    <div class="loc-coords" id="coordDisplay">23.71066, 90.45224</div>
-                    <div class="loc-road">
-                        <span class="road-icon">🛣️</span>
-                        <span id="roadDisplay">JATRA_BARI</span>
-                    </div>
-                    <div class="loc-places" id="placesDisplay">
-                        <span class="active">📍 Dania College</span>
-                        <span>🚉 Rail Station</span>
-                        <span>🏫 Shams School</span>
-                        <span>📍 MATUAIL</span>
-                    </div>
-                </div>
+        <!-- ====== ম্যাপ ====== -->
+        <div class="map-container">
+            <iframe id="mapFrame" 
+                src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14600!2d90.3563!3d23.7772!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1700000000000" 
+                allowfullscreen loading="lazy">
+            </iframe>
+            <div class="map-overlay">
+                <div class="marker">📍</div>
+                <div class="speed-badge" id="mapSpeedBadge">0 km/h</div>
             </div>
         </div>
 
-        <!-- ====== দূরত্ব ====== -->
-        <div class="distance-circle">
+        <!-- ====== দূরত্ব কার্ড ====== -->
+        <div class="circle-card distance-card">
             <div class="inner-bg"></div>
             <div class="content">
                 <div class="icon">📍</div>
@@ -668,10 +611,26 @@
             const trackBtn = document.getElementById('trackBtn');
             const resetBtn = document.getElementById('resetBtn');
             const statusText = document.getElementById('statusText');
-            const statusBadge = document.getElementById('statusBadge');
-            const coordDisplay = document.getElementById('coordDisplay');
-            const roadDisplay = document.getElementById('roadDisplay');
-            const placesDisplay = document.getElementById('placesDisplay');
+            const mapFrame = document.getElementById('mapFrame');
+            const mapSpeedBadge = document.getElementById('mapSpeedBadge');
+
+            // ====== পার্টিকেল জেনারেটর ======
+            function createParticles() {
+                const container = document.getElementById('particles');
+                for (let i = 0; i < 25; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    const size = Math.random() * 4 + 2;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDuration = (Math.random() * 20 + 15) + 's';
+                    particle.style.animationDelay = (Math.random() * 20) + 's';
+                    particle.style.background = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.04)`;
+                    container.appendChild(particle);
+                }
+            }
+            createParticles();
 
             // ====== ভেরিয়েবল ======
             let lastLat = null;
@@ -681,8 +640,10 @@
             let isTracking = false;
             let lastSpeed = 0;
             let speedFilter = [];
+            let isVehicleMoving = false;
             const FILTER_SIZE = 5;
             const STORAGE_KEY = 'speedTrackerData';
+            const SPEED_THRESHOLD = 0.5;
 
             // ====== লোকাল স্টোরেজ ======
             function saveData() {
@@ -725,8 +686,7 @@
                 const mid = Math.floor(sorted.length / 2);
                 let filtered = sorted[mid];
                 
-                // যদি গতি 0.8 km/h এর কম হয় তাহলে 0
-                if (filtered < 0.8) {
+                if (filtered < SPEED_THRESHOLD) {
                     filtered = 0;
                 }
                 return filtered;
@@ -744,34 +704,22 @@
                 return R * c;
             }
 
-            // ====== লোকেশন ডিটেইলস আপডেট ======
-            function updateLocationDetails(lat, lon) {
-                coordDisplay.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-                
-                // রাস্তার নাম (ডেমো - রিয়েল প্রজেক্টে Reverse Geocoding API ব্যবহার করতে হবে)
-                const roads = ['JATRA_BARI', 'MATUAIL Road', 'Dhaka-Mawa Highway', 'Airport Road', 'Gulshan Avenue'];
-                const randomRoad = roads[Math.floor(Math.random() * roads.length)];
-                roadDisplay.textContent = randomRoad;
-
-                // আশেপাশের জায়গা
-                const places = [
-                    'Dania College', 'Rail Station', 'Shams School', 
-                    'MATUAIL', 'Jatra Bari', 'R110', 'Z1102'
-                ];
-                // এলোমেলো ৩-৪টি প্লেস দেখান
-                const shuffled = places.sort(() => 0.5 - Math.random());
-                const selected = shuffled.slice(0, 4);
-                placesDisplay.innerHTML = selected.map(p => 
-                    `<span class="active">📍 ${p}</span>`
-                ).join('');
+            // ====== ম্যাপ আপডেট ======
+            function updateMap(lat, lon, speed) {
+                if (!lat || !lon) return;
+                const url = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14600!2d${lon}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1700000000000`;
+                mapFrame.src = url;
+                mapSpeedBadge.textContent = speed.toFixed(1) + ' km/h';
             }
 
             // ====== UI ======
             function updateUI(speedKmH, distanceKm) {
                 if (speedKmH !== undefined && speedKmH !== null && speedKmH >= 0) {
                     speedEl.innerHTML = `${speedKmH.toFixed(1)} <span class="unit">km/h</span>`;
+                    mapSpeedBadge.textContent = speedKmH.toFixed(1) + ' km/h';
                 } else {
                     speedEl.innerHTML = `0.0 <span class="unit">km/h</span>`;
+                    mapSpeedBadge.textContent = '0 km/h';
                 }
 
                 if (distanceKm !== undefined && distanceKm !== null && distanceKm >= 0) {
@@ -800,11 +748,11 @@
                 }
 
                 let filteredSpeed = getFilteredSpeed(rawSpeed);
+                isVehicleMoving = filteredSpeed > 0.3;
 
-                // দূরত্ব শুধু চলাকালীন
                 if (lastLat !== null && lastLon !== null) {
                     const dist = calculateDistance(lastLat, lastLon, lat, lon);
-                    if (filteredSpeed > 0.5 && dist > 0.003) {
+                    if (isVehicleMoving && dist > 0.003) {
                         totalDistance += dist;
                     }
                 }
@@ -813,15 +761,11 @@
                 lastLon = lon;
                 lastSpeed = filteredSpeed;
 
-                // লোকেশন ডিটেইলস আপডেট
-                updateLocationDetails(lat, lon);
-
+                updateMap(lat, lon, filteredSpeed);
                 updateUI(filteredSpeed, totalDistance);
-                statusText.textContent = '✅ ট্র্যাকিং সচল';
+                
+                statusText.textContent = isVehicleMoving ? '🚗 গাড়ি চলছে' : '🅿️ গাড়ি থামানো';
                 statusText.className = 'status-text active';
-                statusBadge.textContent = 'লাইভ';
-                statusBadge.style.color = '#33ff66';
-                statusBadge.style.borderColor = 'rgba(51, 255, 102, 0.3)';
                 
                 saveData();
             }
@@ -836,9 +780,6 @@
                 }
                 statusText.textContent = '⚠️ ' + msg;
                 statusText.className = 'status-text error';
-                statusBadge.textContent = 'অফলাইন';
-                statusBadge.style.color = '#ff6b6b';
-                statusBadge.style.borderColor = 'rgba(255, 107, 107, 0.3)';
             }
 
             // ====== ট্র্যাকিং ======
@@ -880,9 +821,6 @@
                 trackBtn.className = 'btn-track';
                 statusText.textContent = '⏸ ট্র্যাকিং বন্ধ';
                 statusText.className = 'status-text';
-                statusBadge.textContent = 'স্ট্যান্ডবাই';
-                statusBadge.style.color = 'rgba(255,255,255,0.3)';
-                statusBadge.style.borderColor = 'rgba(255,255,255,0.1)';
                 saveData();
             }
 
@@ -895,17 +833,14 @@
                 lastLon = null;
                 lastSpeed = 0;
                 speedFilter = [];
+                isVehicleMoving = false;
                 
                 updateUI(0, 0);
-                coordDisplay.textContent = '--.----- , --.-----';
-                roadDisplay.textContent = 'রাস্তা খুঁজুন...';
-                placesDisplay.innerHTML = '<span>📍 লোকেশন পাওয়া যায়নি</span>';
                 statusText.textContent = '🔄 রিসেট করা হয়েছে';
                 statusText.className = 'status-text';
-                statusBadge.textContent = 'রিসেট';
-                statusBadge.style.color = 'rgba(255,255,255,0.3)';
-                statusBadge.style.borderColor = 'rgba(255,255,255,0.1)';
                 clearData();
+                
+                mapFrame.src = 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14600!2d90.3563!3d23.7772!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1700000000000';
                 
                 setTimeout(() => {
                     if (!isTracking) {
@@ -920,7 +855,7 @@
                 if (loadData()) {
                     updateUI(lastSpeed, totalDistance);
                     if (lastLat && lastLon) {
-                        updateLocationDetails(lastLat, lastLon);
+                        updateMap(lastLat, lastLon, lastSpeed);
                     }
                     if (totalDistance > 0 || lastSpeed > 0) {
                         statusText.textContent = '💾 আগের ডাটা রিস্টোর';
