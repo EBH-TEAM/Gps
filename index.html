@@ -3,118 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GPS Speed Tracker</title>
-
+<title>GPS Tracker</title>
 <style>
 body{
-    margin:0;
-    background:#111;
-    color:#fff;
-    font-family:Arial,sans-serif;
-    text-align:center;
-    padding-top:50px;
+    background:#111;color:#fff;font-family:Arial;
+    text-align:center;padding:40px 10px;
 }
-
-h3{
-    color:#aaa;
-    margin:15px 0 5px;
-}
-
-.value{
-    font-size:48px;
-    font-weight:bold;
-    margin-bottom:25px;
-}
-
-button{
-    padding:12px 25px;
-    font-size:18px;
-}
+h3{color:#aaa;margin-bottom:5px}
+#speed,#distance{font-size:45px;font-weight:bold;margin:10px}
+button{padding:12px 25px;font-size:18px}
 </style>
 </head>
 
 <body>
 
 <h3>স্পিড</h3>
-<div class="value" id="speed">0.0 km/h</div>
+<div id="speed">0.0 km/h</div>
 
 <h3>দূরত্ব</h3>
-<div class="value" id="distance">0.00 km</div>
+<div id="distance">0.00 km</div>
 
-<button id="btn">▶ শুরু</button>
+<button onclick="toggle()" id="btn">▶ শুরু</button>
 
 <script>
-"use strict";
-
-let watchId = null;
+let watch = null;
 let running = false;
 
 let lastLat = null;
 let lastLon = null;
 let lastTime = null;
 
-let totalDistance = 0;
+let total = 0;
 let currentSpeed = 0;
-
-let speedSamples = [];
-let stationaryCount = 0;
 
 const speedEl = document.getElementById("speed");
 const distanceEl = document.getElementById("distance");
 const btn = document.getElementById("btn");
 
-
-// দুই GPS অবস্থানের দূরত্ব
-function getDistance(lat1, lon1, lat2, lon2){
+function calcDistance(lat1,lon1,lat2,lon2){
 
     const R = 6371000;
-    const p = Math.PI / 180;
+    const p = Math.PI/180;
 
     const a =
-        Math.sin((lat2-lat1)*p/2) ** 2 +
+        Math.sin((lat2-lat1)*p/2)**2 +
         Math.cos(lat1*p) *
         Math.cos(lat2*p) *
-        Math.sin((lon2-lon1)*p/2) ** 2;
+        Math.sin((lon2-lon1)*p/2)**2;
 
-    return R * 2 *
-        Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * 2 * Math.atan2(
+        Math.sqrt(a),
+        Math.sqrt(1-a)
+    );
 }
 
-
-// Speed smooth করা
-function smoothSpeed(value){
-
-    speedSamples.push(value);
-
-    if(speedSamples.length > 5){
-        speedSamples.shift();
-    }
-
-    const sorted = [...speedSamples].sort((a,b)=>a-b);
-
-    // মাঝের reading নেওয়া
-    return sorted[Math.floor(sorted.length/2)];
-}
-
-
-// GPS data
-function handleGPS(position){
+function gps(position){
 
     const lat = position.coords.latitude;
     const lon = position.coords.longitude;
-
-    const accuracy = position.coords.accuracy;
     const gpsSpeed = position.coords.speed;
-
+    const accuracy = position.coords.accuracy;
     const time = position.timestamp;
 
-    // খুব খারাপ GPS signal বাদ
-    if(accuracy > 60){
-        return;
-    }
-
-
-    // প্রথম GPS point
     if(lastLat === null){
 
         lastLat = lat;
@@ -122,236 +72,128 @@ function handleGPS(position){
         lastTime = time;
 
         currentSpeed = 0;
-
-        updateScreen();
+        show();
         return;
     }
 
-
-    const meters = getDistance(
-        lastLat,
-        lastLon,
-        lat,
-        lon
+    const meters = calcDistance(
+        lastLat,lastLon,lat,lon
     );
 
-    const seconds =
-        (time - lastTime) / 1000;
+    const seconds = (time-lastTime)/1000;
 
-    if(seconds <= 0){
-        return;
-    }
+    if(seconds <= 0) return;
 
+    // GPS speed পাওয়া গেলে সেটি ব্যবহার
+    let calculatedSpeed;
 
-    /*
-       GPS speed পাওয়া গেলে
-       সেটাকে সবচেয়ে বেশি গুরুত্ব দেওয়া হবে।
-    */
-
-    let calculatedSpeed = null;
-
-    if(
-        gpsSpeed !== null &&
-        Number.isFinite(gpsSpeed) &&
-        gpsSpeed >= 0
-    ){
-
-        calculatedSpeed =
-            gpsSpeed * 3.6;
-
+    if(gpsSpeed !== null && gpsSpeed >= 0){
+        calculatedSpeed = gpsSpeed * 3.6;
     }else{
-
-        // GPS speed না থাকলে
-        // distance/time দিয়ে speed
-
-        calculatedSpeed =
-            (meters / seconds) * 3.6;
+        calculatedSpeed = (meters/seconds)*3.6;
     }
 
-
     /*
-       GPS jitter থেকে বাঁচার জন্য
-       movement threshold।
-
-       হাঁটার সময় 2m movement-ও
-       ধরা হবে।
+      GPS jitter বাদ দেওয়া।
+      3 মিটারের কম movement হলে
+      distance যোগ হবে না।
     */
+    if(meters >= 3){
 
-    const movementThreshold =
-        Math.max(2, accuracy * 0.25);
-
-
-    /*
-       স্থির থাকা শনাক্ত করা
-    */
-
-    if(
-        meters < movementThreshold &&
-        calculatedSpeed < 1.5
-    ){
-
-        stationaryCount++;
-
-    }else{
-
-        stationaryCount = 0;
-    }
-
-
-    /*
-       কয়েকবার পরপর স্থির থাকলে
-       speed = 0
-    */
-
-    if(stationaryCount >= 2){
-
-        currentSpeed = 0;
-        speedSamples = [];
-
-    }else{
-
-        /*
-           অস্বাভাবিক GPS jump বাদ
-        */
-
-        if(calculatedSpeed <= 200){
-
-            currentSpeed =
-                smoothSpeed(calculatedSpeed);
-        }
-    }
-
-
-    /*
-       Valid movement হলে
-       Distance যোগ হবে।
-    */
-
-    if(
-        meters >= movementThreshold &&
-        calculatedSpeed <= 200
-    ){
-
-        totalDistance += meters / 1000;
+        total += meters/1000;
 
         lastLat = lat;
         lastLon = lon;
         lastTime = time;
-
-    }else if(stationaryCount >= 2){
-
-        /*
-           দাঁড়িয়ে থাকলে reference point
-           update করা হবে না,
-           যাতে GPS jitter distance না বাড়ায়।
-        */
-
     }
 
+    /*
+      GPS speed না থাকলে movement থেকে speed।
+      হাঁটার সময় 0 না দেখানোর জন্য
+      calculated speed ব্যবহার করা হচ্ছে।
+    */
+    if(calculatedSpeed >= 0.5){
 
-    // খুব কম speed হলে zero
-    if(currentSpeed < 0.5){
-        currentSpeed = 0;
-    }
+        currentSpeed = calculatedSpeed;
 
+    }else if(meters >= 3){
 
-    updateScreen();
-}
-
-
-// Screen update
-function updateScreen(){
-
-    speedEl.textContent =
-        currentSpeed.toFixed(1) + " km/h";
-
-    distanceEl.textContent =
-        totalDistance.toFixed(2) + " km";
-}
-
-
-// GPS error
-function gpsError(){
-
-    currentSpeed = 0;
-    updateScreen();
-}
-
-
-// Start
-function startTracking(){
-
-    if(!navigator.geolocation){
-
-        alert("এই ডিভাইসে GPS পাওয়া যায়নি।");
-        return;
-    }
-
-
-    watchId =
-        navigator.geolocation.watchPosition(
-            handleGPS,
-            gpsError,
-            {
-                enableHighAccuracy:true,
-                maximumAge:0,
-                timeout:15000
-            }
-        );
-
-
-    running = true;
-
-    btn.textContent = "⏹ বন্ধ";
-}
-
-
-// Stop
-function stopTracking(){
-
-    if(watchId !== null){
-
-        navigator.geolocation.clearWatch(
-            watchId
-        );
-
-        watchId = null;
-    }
-
-
-    running = false;
-
-    currentSpeed = 0;
-
-    speedSamples = [];
-
-    lastLat = null;
-    lastLon = null;
-    lastTime = null;
-
-    updateScreen();
-
-    btn.textContent = "▶ শুরু";
-}
-
-
-// Button
-btn.addEventListener("click",function(){
-
-    if(running){
-
-        stopTracking();
+        currentSpeed = (meters/seconds)*3.6;
 
     }else{
 
-        startTracking();
+        currentSpeed = 0;
     }
 
-});
+    // অস্বাভাবিক GPS jump বাদ
+    if(currentSpeed > 200){
+        currentSpeed = 0;
+    }
 
+    show();
+}
 
-updateScreen();
+function show(){
 
+    speedEl.textContent =
+        currentSpeed.toFixed(1)+" km/h";
+
+    distanceEl.textContent =
+        total.toFixed(2)+" km";
+}
+
+function error(){
+
+    currentSpeed = 0;
+    show();
+}
+
+function start(){
+
+    if(!navigator.geolocation){
+        alert("GPS সাপোর্ট নেই");
+        return;
+    }
+
+    watch = navigator.geolocation.watchPosition(
+        gps,
+        error,
+        {
+            enableHighAccuracy:true,
+            maximumAge:0,
+            timeout:15000
+        }
+    );
+
+    running = true;
+    btn.textContent="⏹ বন্ধ";
+}
+
+function stop(){
+
+    if(watch !== null){
+        navigator.geolocation.clearWatch(watch);
+        watch=null;
+    }
+
+    running=false;
+    currentSpeed=0;
+
+    show();
+
+    btn.textContent="▶ শুরু";
+}
+
+function toggle(){
+
+    if(running){
+        stop();
+    }else{
+        start();
+    }
+}
+
+show();
 </script>
 
 </body>
