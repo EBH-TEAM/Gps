@@ -24,7 +24,6 @@
             position: relative;
         }
 
-        /* ====== পটভূমির এনিমেটেড ইফেক্ট ====== */
         body::before {
             content: '';
             position: fixed;
@@ -48,7 +47,6 @@
             100% { transform: scale(1.05) rotate(360deg); }
         }
 
-        /* ফ্লোটিং পার্টিকেল */
         .particles {
             position: fixed;
             top: 0;
@@ -89,7 +87,6 @@
             justify-content: space-between;
         }
 
-        /* ====== উপরের স্পিড কার্ড ====== */
         .circle-card {
             width: 100%;
             max-width: 300px;
@@ -123,7 +120,6 @@
             padding: 10px;
         }
 
-        /* স্পিড কার্ড */
         .speed-card {
             background: radial-gradient(circle at 30% 30%, #141e33, #080e1a);
         }
@@ -177,7 +173,6 @@
             100% { --angle: 360deg; background-position: 100% 50%; }
         }
 
-        /* ====== গাড়ির এনিমেশন ====== */
         .car-animation {
             font-size: 48px;
             margin-bottom: 2px;
@@ -233,7 +228,6 @@
             color: rgba(255, 255, 255, 0.2);
         }
 
-        /* ====== নিচের দূরত্ব কার্ড ====== */
         .distance-card {
             background: radial-gradient(circle at 30% 30%, #1a2e22, #0a1410);
         }
@@ -323,7 +317,6 @@
             color: rgba(255, 255, 255, 0.2);
         }
 
-        /* ====== স্ট্যাটাস ====== */
         .status-area {
             display: flex;
             flex-direction: column;
@@ -375,7 +368,6 @@
             50% { transform: scale(1.8); opacity: 1; box-shadow: 0 0 25px currentColor, 0 0 50px currentColor; }
         }
 
-        /* ====== বাটন ====== */
         .button-area {
             display: flex;
             gap: 10px;
@@ -454,7 +446,6 @@
         }
         .btn-reset:active { transform: scale(0.9); }
 
-        /* ====== রেসপন্সিভ ====== */
         @media (max-width: 420px) {
             .circle-card { max-width: 250px; }
             .speed-card .value { font-size: 44px; }
@@ -494,12 +485,9 @@
 </head>
 <body>
 
-    <!-- ====== পার্টিকেল ====== -->
     <div class="particles" id="particles"></div>
 
     <div class="container">
-
-        <!-- ====== স্পিড কার্ড ====== -->
         <div class="circle-card speed-card">
             <div class="inner-bg"></div>
             <div class="content">
@@ -509,7 +497,6 @@
             </div>
         </div>
 
-        <!-- ====== দূরত্ব কার্ড ====== -->
         <div class="circle-card distance-card">
             <div class="inner-bg"></div>
             <div class="content">
@@ -519,7 +506,6 @@
             </div>
         </div>
 
-        <!-- ====== স্ট্যাটাস ====== -->
         <div class="status-area">
             <div class="status-text" id="statusText">🛰️ শুরু করতে বাটনে ক্লিক করুন</div>
             <div class="rgb-dots">
@@ -527,12 +513,10 @@
             </div>
         </div>
 
-        <!-- ====== বাটন ====== -->
         <div class="button-area">
             <button class="btn-track" id="trackBtn">▶ শুরু</button>
             <button class="btn-reset" id="resetBtn" title="রিসেট">↺</button>
         </div>
-
     </div>
 
     <script>
@@ -546,7 +530,6 @@
             const statusText = document.getElementById('statusText');
             const carIcon = document.getElementById('carIcon');
 
-            // ====== পার্টিকেল ======
             function createParticles() {
                 const container = document.getElementById('particles');
                 for (let i = 0; i < 20; i++) {
@@ -564,20 +547,19 @@
             }
             createParticles();
 
-            // ====== ভেরিয়েবল ======
             let lastLat = null;
             let lastLon = null;
+            let lastTime = null;
             let totalDistance = 0;
             let watchId = null;
             let isTracking = false;
             let lastSpeed = 0;
-            let speedHistory = [];
-            let isVehicleMoving = false;
-            const HISTORY_SIZE = 8;
+            
+            // ফিল্টারিং কনফিগারেশন 
+            const MAX_ALLOWED_ACCURACY = 25; // ২৫ মিটারের দুর্বল সিগন্যাল বাদ দেওয়া হবে
+            const MIN_WALKING_SPEED = 0.5;   // হাঁটার গতি (০.৫ km/h বা তার বেশি হলে ধরবে)
             const STORAGE_KEY = 'speedTrackerData';
-            const SPEED_THRESHOLD = 0.8;
 
-            // ====== লোকাল স্টোরেজ ======
             function saveData() {
                 try {
                     const data = {
@@ -608,124 +590,93 @@
                 try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
             }
 
-            // ====== স্পিড ফিল্টার ======
-            function getFilteredSpeed(newSpeed) {
-                speedHistory.push(newSpeed);
-                if (speedHistory.length > HISTORY_SIZE) {
-                    speedHistory.shift();
-                }
-                
-                // মিডিয়ান ফিল্টার
-                const sorted = [...speedHistory].sort((a, b) => a - b);
-                const mid = Math.floor(sorted.length / 2);
-                let filtered = sorted[mid];
-                
-                // থ্রেশহোল্ডের কম হলে 0
-                if (filtered < SPEED_THRESHOLD) {
-                    filtered = 0;
-                }
-                
-                // ভ্যারিয়েন্স চেক - যদি ডাটা অনেক বেশি ওঠানামা করে তাহলে ইগনোর
-                if (speedHistory.length >= 3) {
-                    const avg = speedHistory.reduce((a, b) => a + b, 0) / speedHistory.length;
-                    const variance = speedHistory.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / speedHistory.length;
-                    if (variance > 20 && filtered > 0) {
-                        // যদি ভ্যারিয়েন্স বেশি হয়, তাহলে ধরে নিচ্ছি GPS ভুল দেখাচ্ছে
-                        const lastValid = speedHistory.filter(s => s < 2).length > 2 ? 0 : filtered;
-                        filtered = lastValid;
-                    }
-                }
-                
-                return filtered;
-            }
-
-            // ====== দূরত্ব ======
-            function calculateDistance(lat1, lon1, lat2, lon2) {
-                const R = 6371;
+            // দুই জিপিএস পয়েন্টের দূরত্ব (মিটারে)
+            function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+                const R = 6371000; // মিটার
                 const dLat = (lat2 - lat1) * Math.PI / 180;
                 const dLon = (lon2 - lon1) * Math.PI / 180;
                 const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                           Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                           Math.sin(dLon/2) * Math.sin(dLon/2);
                 const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                return R * c;
+                return R * c; 
             }
 
-            // ====== গাড়ির এনিমেশন আপডেট ======
             function updateCarAnimation(isMoving) {
                 if (isMoving) {
                     carIcon.className = 'car-animation running';
-                    carIcon.textContent = '🚗';
                 } else {
                     carIcon.className = 'car-animation stopped';
-                    carIcon.textContent = '🚗';
                 }
             }
 
-            // ====== UI ======
             function updateUI(speedKmH, distanceKm, isMoving) {
-                if (speedKmH !== undefined && speedKmH !== null && speedKmH >= 0) {
-                    speedEl.innerHTML = `${speedKmH.toFixed(1)} <span class="unit">km/h</span>`;
-                } else {
-                    speedEl.innerHTML = `0.0 <span class="unit">km/h</span>`;
-                }
-
-                if (distanceKm !== undefined && distanceKm !== null && distanceKm >= 0) {
-                    distanceEl.innerHTML = `${distanceKm.toFixed(2)} <span class="unit">km</span>`;
-                } else {
-                    distanceEl.innerHTML = `0.00 <span class="unit">km</span>`;
-                }
-
+                speedEl.innerHTML = `${(speedKmH || 0).toFixed(1)} <span class="unit">km/h</span>`;
+                distanceEl.innerHTML = `${(distanceKm || 0).toFixed(2)} <span class="unit">km</span>`;
                 updateCarAnimation(isMoving);
             }
 
-            // ====== লোকেশন ======
             function handlePosition(position) {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                const speedMps = position.coords.speed;
                 const accuracy = position.coords.accuracy;
+                const currentTime = position.timestamp;
 
-                // একুরেসি চেক
-                if (accuracy > 40) {
-                    statusText.textContent = '⚠️ GPS সিগন্যাল দুর্বল';
+                // খারাপ একুরেসি পরিহার
+                if (accuracy > MAX_ALLOWED_ACCURACY) {
+                    statusText.textContent = '⚠️ দুর্বল GPS সংকেত বাদ দেওয়া হচ্ছে';
                     statusText.className = 'status-text error';
                     return;
                 }
 
-                let rawSpeed = 0;
-                if (speedMps !== null && speedMps >= 0) {
-                    rawSpeed = speedMps * 3.6;
-                }
+                let currentSpeedKmH = 0;
 
-                // ফিল্টার প্রয়োগ
-                let filteredSpeed = getFilteredSpeed(rawSpeed);
-                
-                // গাড়ি চলছে কিনা চেক (থ্রেশহোল্ড 0.5)
-                isVehicleMoving = filteredSpeed > 0.5;
+                if (lastLat !== null && lastLon !== null && lastTime !== null) {
+                    const distMeters = calculateDistanceMeters(lastLat, lastLon, lat, lon);
+                    const timeSec = (currentTime - lastTime) / 1000;
 
-                // দূরত্ব গণনা - শুধু চলাকালীন
-                if (lastLat !== null && lastLon !== null) {
-                    const dist = calculateDistance(lastLat, lastLon, lat, lon);
-                    // মিনিমাম ডিসটেন্স 3 মিটার এবং শুধু চলাকালীন
-                    if (isVehicleMoving && dist > 0.003) {
-                        totalDistance += dist;
+                    if (timeSec > 0) {
+                        // দূরত্বের গাণিতিক গতি (km/h)
+                        const calculatedSpeedKmH = (distMeters / timeSec) * 3.6;
+
+                        // যদি ডিভাইসের জিপিএস থেকে সরাসরি সঠিক গতি পাওয়া যায়
+                        if (position.coords.speed !== null && position.coords.speed >= 0) {
+                            currentSpeedKmH = position.coords.speed * 3.6;
+                        } else {
+                            currentSpeedKmH = calculatedSpeedKmH;
+                        }
+
+                        // ফিল্টার: হাঁটার মতো ন্যূনতম গতি না থাকলে এবং ৩ মিটারের কম পরিবর্তন হলে ০ ধরা হবে
+                        if (currentSpeedKmH < MIN_WALKING_SPEED || distMeters < 2.5) {
+                            currentSpeedKmH = 0;
+                        } else {
+                            // শুধুমাত্র অবস্থান পরিবর্তন ও বাস্তব গতির ক্ষেত্রে দূরত্ব বৃদ্ধি পাবে
+                            totalDistance += (distMeters / 1000);
+                            lastLat = lat;
+                            lastLon = lon;
+                            lastTime = currentTime;
+                        }
                     }
+                } else {
+                    lastLat = lat;
+                    lastLon = lon;
+                    lastTime = currentTime;
                 }
 
-                lastLat = lat;
-                lastLon = lon;
-                lastSpeed = filteredSpeed;
+                lastSpeed = currentSpeedKmH;
+                const isMoving = currentSpeedKmH >= MIN_WALKING_SPEED;
 
-                // UI আপডেট
-                updateUI(filteredSpeed, totalDistance, isVehicleMoving);
+                updateUI(currentSpeedKmH, totalDistance, isMoving);
                 
-                // স্ট্যাটাস টেক্সট
-                if (isVehicleMoving) {
-                    statusText.textContent = '🚗 গাড়ি চলছে';
+                if (isMoving) {
+                    if (currentSpeedKmH < 7) {
+                        statusText.textContent = '🚶 হাঁটা ট্র্যাকিং হচ্ছে';
+                    } else {
+                        statusText.textContent = '🚗 গাড়ি/বাইক চলছে';
+                    }
                     statusText.className = 'status-text active';
                 } else {
-                    statusText.textContent = '🅿️ গাড়ি থামানো';
+                    statusText.textContent = '🅿️ স্থির (স্থগিত)';
                     statusText.className = 'status-text';
                 }
                 
@@ -745,7 +696,6 @@
                 updateCarAnimation(false);
             }
 
-            // ====== ট্র্যাকিং ======
             function startTracking() {
                 if (!("geolocation" in navigator)) {
                     alert("আপনার ব্রাউজার Geolocation সাপোর্ট করে না।");
@@ -763,14 +713,14 @@
                     {
                         enableHighAccuracy: true,
                         maximumAge: 0,
-                        timeout: 10000
+                        timeout: 5000
                     }
                 );
 
                 isTracking = true;
                 trackBtn.textContent = '⏹ থামান';
                 trackBtn.className = 'btn-track stop';
-                statusText.textContent = '📡 লোকেশন সংগ্রহ...';
+                statusText.textContent = '📡 স্যাটেলাইট সংযোগ তৈরি হচ্ছে...';
                 statusText.className = 'status-text';
             }
 
@@ -788,16 +738,14 @@
                 saveData();
             }
 
-            // ====== রিসেট ======
             function resetAll() {
                 if (isTracking) stopTracking();
                 
                 totalDistance = 0;
                 lastLat = null;
                 lastLon = null;
+                lastTime = null;
                 lastSpeed = 0;
-                speedHistory = [];
-                isVehicleMoving = false;
                 
                 updateUI(0, 0, false);
                 statusText.textContent = '🔄 রিসেট করা হয়েছে';
@@ -812,12 +760,11 @@
                 }, 2000);
             }
 
-            // ====== রিস্টোর ======
             function restoreData() {
                 if (loadData()) {
-                    updateUI(lastSpeed, totalDistance, false);
-                    if (totalDistance > 0 || lastSpeed > 0) {
-                        statusText.textContent = '💾 আগের ডাটা রিস্টোর';
+                    updateUI(0, totalDistance, false);
+                    if (totalDistance > 0) {
+                        statusText.textContent = '💾 আগের তথ্য লোড হয়েছে';
                         statusText.className = 'status-text';
                         setTimeout(() => {
                             if (!isTracking) {
@@ -829,7 +776,6 @@
                 }
             }
 
-            // ====== ইভেন্ট ======
             trackBtn.addEventListener('click', startTracking);
             resetBtn.addEventListener('click', resetAll);
 
@@ -838,10 +784,9 @@
                 if (watchId !== null) navigator.geolocation.clearWatch(watchId);
             });
 
-            // ====== শুরু ======
             restoreData();
             if (!isTracking) {
-                updateUI(0, 0, false);
+                updateUI(0, totalDistance, false);
             }
 
         })();
