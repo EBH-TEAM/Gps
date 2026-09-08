@@ -28,7 +28,7 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
+            padding: 6px 12px 8px 12px;
             background: radial-gradient(circle at 50% 30%, #0c1622, #04080c 80%);
         }
 
@@ -37,8 +37,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 5px;
-            height: 20px;
+            padding: 0 2px;
+            height: 28px;
+            flex-shrink: 0;
         }
 
         .brand-name {
@@ -71,21 +72,24 @@
             box-shadow: 0 0 10px #00e5cc;
         }
 
-        /* Large Gauge Container with Zero Padding */
+        /* Gauge area – more compact, no extra space */
         .gauge-area {
             position: relative;
             width: 100%;
-            max-width: 480px;
-            flex: 1;
+            max-width: 460px;
+            flex: 1 1 auto;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 0; /* allow shrink */
             margin: 0;
+            padding: 0;
         }
 
         .gauge-svg {
             width: 100%;
             height: 100%;
+            display: block;
             overflow: visible;
         }
 
@@ -98,21 +102,25 @@
             filter: drop-shadow(0 0 8px #00e5cc);
         }
 
-        /* Speed Text Positioned Inside Gauge Gap */
+        /* Digital display – repositioned slightly lower & centered */
         .digital-display {
             position: absolute;
-            bottom: 12%;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             flex-direction: column;
             align-items: center;
+            pointer-events: none;
         }
 
         .speed-number {
-            font-size: 65px;
+            font-size: 64px;
             font-weight: 800;
             color: #00e5cc;
             line-height: 0.8;
             text-shadow: 0 0 20px rgba(0, 229, 204, 0.4);
+            letter-spacing: -1px;
         }
 
         .unit {
@@ -123,14 +131,15 @@
             font-weight: 700;
         }
 
-        /* Bottom Section Lifted Up */
+        /* Bottom section – tighter, lifted up */
         .bottom-section {
             width: 100%;
             max-width: 400px;
             display: flex;
             flex-direction: column;
             gap: 6px;
-            margin-bottom: 5px;
+            flex-shrink: 0;
+            padding-bottom: 2px;
         }
 
         .stats-panel {
@@ -138,7 +147,7 @@
             grid-template-columns: 1fr 1fr 1fr;
             background: rgba(12, 22, 34, 0.7);
             border-radius: 10px;
-            padding: 8px 4px;
+            padding: 6px 4px;
             border: 1px solid rgba(0, 229, 204, 0.08);
             text-align: center;
             backdrop-filter: blur(10px);
@@ -147,7 +156,7 @@
         .stat-box {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 0px;
             border-right: 1px solid rgba(255, 255, 255, 0.05);
         }
 
@@ -180,7 +189,7 @@
 
         .btn {
             flex: 1;
-            padding: 12px;
+            padding: 12px 8px;
             border: none;
             border-radius: 8px;
             font-size: 12px;
@@ -213,6 +222,28 @@
             color: #ffffff;
             background: rgba(255, 255, 255, 0.2);
         }
+
+        /* small screens fine-tune */
+        @media (max-height: 700px) {
+            .top-bar { height: 24px; }
+            .brand-name { font-size: 11px; }
+            .gps-status { font-size: 9px; }
+            .digital-display { bottom: 6%; }
+            .speed-number { font-size: 52px; }
+            .stat-value { font-size: 14px; }
+            .btn { padding: 10px 6px; font-size: 11px; }
+            .stats-panel { padding: 4px 2px; }
+        }
+
+        @media (max-height: 640px) {
+            .digital-display { bottom: 4%; }
+            .speed-number { font-size: 44px; }
+            .stat-value { font-size: 13px; }
+            .btn { padding: 8px 4px; font-size: 10px; }
+            .stats-panel { padding: 3px 2px; gap: 0px; }
+            .stat-label { font-size: 8px; }
+            .bottom-section { gap: 4px; }
+        }
     </style>
 </head>
 <body>
@@ -227,8 +258,7 @@
         </div>
 
         <div class="gauge-area">
-            <!-- ViewBox Cropped To Remove Top/Bottom Empty Canvas Gaps -->
-            <svg class="gauge-svg" viewBox="10 10 280 230">
+            <svg class="gauge-svg" viewBox="10 10 280 230" preserveAspectRatio="xMidYMid meet">
                 <defs>
                     <linearGradient id="gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stop-color="#00e5cc" />
@@ -258,7 +288,6 @@
                 <circle cx="150" cy="135" r="9" fill="#04080c" stroke="#00e5cc" stroke-width="3"/>
             </svg>
 
-            <!-- Digital Display directly overlayed on meter -->
             <div class="digital-display">
                 <div class="speed-number" id="speedText">0.0</div>
                 <div class="unit">KM / H</div>
@@ -322,10 +351,8 @@
 
             function updateGauge(speed) {
                 const clamped = Math.min(Math.max(speed, 0), maxGaugeSpeed);
-                
                 const angle = -135 + (clamped / maxGaugeSpeed) * 270;
                 needle.style.transform = `rotate(${angle + 135}deg)`;
-
                 const offset = arcTotalLength - (clamped / maxGaugeSpeed) * arcTotalLength;
                 gaugeArc.style.strokeDashoffset = offset;
             }
@@ -333,7 +360,6 @@
             function loadSavedStats() {
                 maxSpeedEl.textContent = maxSpeed.toFixed(1);
                 tripDistEl.textContent = tripDistance.toFixed(2);
-                
                 if (speedSamples.length > 0) {
                     const avg = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
                     avgSpeedEl.textContent = avg.toFixed(1);
@@ -351,11 +377,9 @@
                 } else {
                     currentSpeed = targetSpeed;
                 }
-
                 const displaySpeed = currentSpeed < 0.1 ? 0 : currentSpeed;
                 speedText.textContent = displaySpeed.toFixed(1);
                 updateGauge(displaySpeed);
-
                 requestAnimationFrame(animateLoop);
             }
             requestAnimationFrame(animateLoop);
@@ -417,7 +441,6 @@
                     speedSamples.push(calculatedSpeed);
                     if (speedSamples.length > 300) speedSamples.shift();
                     localStorage.setItem('ebh_speed_samples', JSON.stringify(speedSamples));
-                    
                     const avg = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
                     avgSpeedEl.textContent = avg.toFixed(1);
                 }
