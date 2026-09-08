@@ -10,54 +10,52 @@
             padding: 0;
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
         }
 
-        body {
-            background-color: #06090e;
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-        }
-
-        .dashboard {
+        html, body {
             width: 100%;
-            max-width: 380px;
-            background: #0a0f16;
-            border-radius: 20px;
-            padding: 20px 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 1px solid rgba(0, 229, 204, 0.1);
+            height: 100%;
+            background-color: #04080c;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .app-container {
+            width: 100vw;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 15px;
+            background: radial-gradient(circle at 50% 30%, #0c1622, #04080c 80%);
         }
 
-        /* Top Header */
         .top-bar {
+            width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 5px;
+            padding: 5px 10px;
         }
 
         .brand-name {
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: 2px;
             color: #00e5cc;
-            text-transform: uppercase;
+            text-shadow: 0 0 8px rgba(0, 229, 204, 0.4);
         }
 
         .gps-status {
             font-size: 11px;
-            color: #00e5cc;
+            color: #5b6e82;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             letter-spacing: 1px;
+            font-weight: 600;
         }
 
         .gps-dot {
@@ -69,14 +67,14 @@
 
         .gps-dot.active {
             background-color: #00e5cc;
-            box-shadow: 0 0 8px #00e5cc;
+            box-shadow: 0 0 10px #00e5cc;
         }
 
-        /* Gauge Meter Area */
-        .gauge-container {
+        .gauge-area {
             position: relative;
             width: 100%;
-            height: 260px;
+            max-width: 420px;
+            height: 52vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -85,80 +83,66 @@
         .gauge-svg {
             width: 100%;
             height: 100%;
-        }
-
-        .gauge-bg {
-            fill: none;
-            stroke: #121a24;
-            stroke-width: 12;
-            stroke-dasharray: 440;
-            stroke-dashoffset: 0;
-            stroke-linecap: round;
-        }
-
-        .gauge-speed {
-            fill: none;
-            stroke: url(#gauge-gradient);
-            stroke-width: 12;
-            stroke-dasharray: 440;
-            stroke-dashoffset: 440;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.3s ease;
+            overflow: visible;
         }
 
         .needle {
             stroke: #00e5cc;
-            stroke-width: 3;
+            stroke-width: 3.5;
             stroke-linecap: round;
             transform-origin: 150px 150px;
-            transition: transform 0.3s ease;
-            filter: drop-shadow(0 0 6px #00e5cc);
+            transition: transform 0.2s cubic-bezier(0.1, 0.6, 0.2, 1);
+            filter: drop-shadow(0 0 8px #00e5cc);
         }
 
-        .needle-center {
-            fill: #0a0f16;
-            stroke: #00e5cc;
-            stroke-width: 3;
-        }
-
-        /* Digital Display */
         .digital-display {
-            text-align: center;
-            margin-top: -30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: -20px;
         }
 
         .speed-number {
-            font-size: 64px;
+            font-size: 80px;
             font-weight: 800;
             color: #00e5cc;
-            line-height: 1;
-            text-shadow: 0 0 20px rgba(0, 229, 204, 0.3);
+            line-height: 0.9;
+            text-shadow: 0 0 25px rgba(0, 229, 204, 0.4);
         }
 
         .unit {
-            font-size: 12px;
+            font-size: 13px;
             color: #5b6e82;
-            letter-spacing: 3px;
-            margin-top: 4px;
-            font-weight: 600;
+            letter-spacing: 4px;
+            margin-top: 8px;
+            font-weight: 700;
         }
 
-        /* Stats Cards Panel */
+        .bottom-section {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
         .stats-panel {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            background: #06090e;
-            border-radius: 12px;
-            padding: 12px 5px;
-            border: 1px solid rgba(255,255,255,0.03);
+            background: rgba(12, 22, 34, 0.6);
+            border-radius: 14px;
+            padding: 15px 5px;
+            border: 1px solid rgba(0, 229, 204, 0.08);
             text-align: center;
+            backdrop-filter: blur(10px);
         }
 
         .stat-box {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            border-right: 1px solid rgba(255,255,255,0.05);
+            gap: 5px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .stat-box:last-child {
@@ -168,35 +152,34 @@
         .stat-label {
             font-size: 10px;
             color: #5b6e82;
-            letter-spacing: 1px;
-            font-weight: 600;
+            letter-spacing: 2px;
+            font-weight: 700;
         }
 
         .stat-value {
-            font-size: 18px;
+            font-size: 22px;
             font-weight: 700;
-            color: #ffb703;
+            color: #ffcc00;
         }
 
         .stat-value.cyan {
             color: #00e5cc;
         }
 
-        /* Control Buttons */
         .controls {
             display: flex;
-            gap: 10px;
-            margin-top: 5px;
+            gap: 12px;
+            width: 100%;
         }
 
         .btn {
             flex: 1;
-            padding: 12px;
+            padding: 15px;
             border: none;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2px;
             cursor: pointer;
             text-transform: uppercase;
             transition: all 0.2s ease;
@@ -204,105 +187,98 @@
 
         .btn-start {
             background: #00e5cc;
-            color: #06090e;
-            box-shadow: 0 0 15px rgba(0, 229, 204, 0.2);
+            color: #04080c;
+            box-shadow: 0 0 20px rgba(0, 229, 204, 0.3);
         }
 
         .btn-start.stop {
             background: #ff3366;
             color: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 51, 102, 0.2);
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
         }
 
         .btn-reset {
-            background: #121a24;
+            background: rgba(255, 255, 255, 0.05);
             color: #5b6e82;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .btn-reset:active {
             color: #ffffff;
-            background: #1a2636;
+            background: rgba(255, 255, 255, 0.15);
         }
     </style>
 </head>
 <body>
 
-    <div class="dashboard">
-        <!-- Top Bar -->
+    <div class="app-container">
         <div class="top-bar">
-            <div class="brand-name">EBH Speed Meter</div>
+            <div class="brand-name">EBH SPEED METER</div>
             <div class="gps-status">
                 <div class="gps-dot" id="gpsDot"></div>
                 <span id="gpsText">GPS OFF</span>
             </div>
         </div>
 
-        <!-- Gauge Dial -->
-        <div class="gauge-container">
+        <div class="gauge-area">
             <svg class="gauge-svg" viewBox="0 0 300 300">
                 <defs>
-                    <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient id="gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stop-color="#00e5cc" />
-                        <stop offset="70%" stop-color="#ffb703" />
+                        <stop offset="60%" stop-color="#ffcc00" />
                         <stop offset="100%" stop-color="#ff3366" />
                     </linearGradient>
                 </defs>
 
-                <!-- Background Arc -->
-                <path class="gauge-bg" d="M 50 220 A 120 120 0 1 1 250 220" />
+                <path d="M 40 230 A 130 130 0 1 1 260 230" fill="none" stroke="#101924" stroke-width="12" stroke-linecap="round"/>
                 
-                <!-- Speed Arc -->
-                <path class="gauge-speed" id="gaugeArc" d="M 50 220 A 120 120 0 1 1 250 220" />
+                <path id="gaugeArc" d="M 40 230 A 130 130 0 1 1 260 230" fill="none" stroke="url(#gauge-grad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="610" stroke-dashoffset="610"/>
 
-                <!-- Ticks & Numbers -->
-                <!-- 0 -->
-                <text x="50" y="240" fill="#5b6e82" font-size="10" text-anchor="middle">0</text>
-                <!-- 20 -->
-                <text x="35" y="160" fill="#5b6e82" font-size="10" text-anchor="middle">20</text>
-                <!-- 40 -->
-                <text x="65" y="90" fill="#5b6e82" font-size="10" text-anchor="middle">40</text>
-                <!-- 60 -->
-                <text x="150" y="55" fill="#5b6e82" font-size="10" text-anchor="middle">60</text>
-                <!-- 80 -->
-                <text x="235" y="90" fill="#5b6e82" font-size="10" text-anchor="middle">80</text>
-                <!-- 100 -->
-                <text x="265" y="160" fill="#5b6e82" font-size="10" text-anchor="middle">100</text>
-                <!-- 120 -->
-                <text x="250" y="240" fill="#ff3366" font-size="10" text-anchor="middle">120</text>
+                <!-- 0 to 50 scale with step 5 -->
+                <text x="35" y="238" fill="#5b6e82" font-size="9" font-weight="700" text-anchor="middle">0</text>
+                <text x="25" y="195" fill="#5b6e82" font-size="9" font-weight="700" text-anchor="middle">5</text>
+                <text x="30" y="148" fill="#5b6e82" font-size="9" font-weight="700" text-anchor="middle">10</text>
+                <text x="50" y="105" fill="#5b6e82" font-size="9" font-weight="700" text-anchor="middle">15</text>
+                <text x="82" y="70" fill="#5b6e82" font-size="9" font-weight="700" text-anchor="middle">20</text>
+                <text x="123" y="52" fill="#5b6e82" font-size="9" font-weight="700" text-anchor="middle">25</text>
+                <text x="177" y="52" fill="#ffcc00" font-size="9" font-weight="700" text-anchor="middle">30</text>
+                <text x="218" y="70" fill="#ffcc00" font-size="9" font-weight="700" text-anchor="middle">35</text>
+                <text x="250" y="105" fill="#ff3366" font-size="9" font-weight="700" text-anchor="middle">40</text>
+                <text x="270" y="148" fill="#ff3366" font-size="9" font-weight="700" text-anchor="middle">45</text>
+                <text x="265" y="238" fill="#ff3366" font-size="9" font-weight="700" text-anchor="middle">50</text>
 
-                <!-- Needle -->
-                <line id="needle" class="needle" x1="150" y1="150" x2="65" y2="215" />
-                <circle class="needle-center" cx="150" cy="150" r="8" />
+                <!-- Needle (Starts at exact 0 angle) -->
+                <line id="needle" class="needle" x1="150" y1="150" x2="58" y2="222" />
+                
+                <circle cx="150" cy="150" r="9" fill="#04080c" stroke="#00e5cc" stroke-width="3"/>
             </svg>
         </div>
 
-        <!-- Digital Speed -->
         <div class="digital-display">
             <div class="speed-number" id="speedText">0</div>
             <div class="unit">KM / H</div>
         </div>
 
-        <!-- Stats Panel -->
-        <div class="stats-panel">
-            <div class="stat-box">
-                <div class="stat-label">AVG</div>
-                <div class="stat-value" id="avgSpeed">0.0</div>
+        <div class="bottom-section">
+            <div class="stats-panel">
+                <div class="stat-box">
+                    <div class="stat-label">AVG</div>
+                    <div class="stat-value" id="avgSpeed">0.0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">MAX</div>
+                    <div class="stat-value" id="maxSpeed">0.0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">TRIP</div>
+                    <div class="stat-value cyan" id="tripDist">0.00</div>
+                </div>
             </div>
-            <div class="stat-box">
-                <div class="stat-label">MAX</div>
-                <div class="stat-value" id="maxSpeed">0.0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">TRIP</div>
-                <div class="stat-value cyan" id="tripDist">0.00</div>
-            </div>
-        </div>
 
-        <!-- Buttons -->
-        <div class="controls">
-            <button class="btn btn-start" id="startBtn">START</button>
-            <button class="btn btn-reset" id="resetBtn">RESET</button>
+            <div class="controls">
+                <button class="btn btn-start" id="startBtn">START</button>
+                <button class="btn btn-reset" id="resetBtn">RESET</button>
+            </div>
         </div>
     </div>
 
@@ -310,7 +286,6 @@
         (function() {
             "use strict";
 
-            // Elements
             const speedText = document.getElementById('speedText');
             const avgSpeedEl = document.getElementById('avgSpeed');
             const maxSpeedEl = document.getElementById('maxSpeed');
@@ -322,13 +297,12 @@
             const needle = document.getElementById('needle');
             const gaugeArc = document.getElementById('gaugeArc');
 
-            // Variables
             let watchId = null;
             let isTracking = false;
 
             let currentSpeed = 0;
             let targetSpeed = 0;
-            
+
             let maxSpeed = parseFloat(localStorage.getItem('ebh_max_speed')) || 0;
             let tripDistance = parseFloat(localStorage.getItem('ebh_trip_dist')) || 0;
             let speedSamples = JSON.parse(localStorage.getItem('ebh_speed_samples')) || [];
@@ -337,25 +311,21 @@
             let lastLon = null;
             let lastTime = null;
 
-            // Gauge Setup (Arc calculation)
-            const maxGaugeSpeed = 120; // Gauge capacity 120 km/h
-            const arcTotalLength = 565; // Total stroke dash length for arc
+            const maxGaugeSpeed = 50; // Max speed set to 50 km/h
+            const arcTotalLength = 610;
 
-            function setGaugeSpeed(speed) {
-                // Limit speed for gauge display
-                const clampedSpeed = Math.min(Math.max(speed, 0), maxGaugeSpeed);
+            function updateGauge(speed) {
+                const clamped = Math.min(Math.max(speed, 0), maxGaugeSpeed);
                 
-                // Calculate Needle Rotation (-135deg to +135deg)
-                const angle = -135 + (clampedSpeed / maxGaugeSpeed) * 270;
-                needle.style.transform = `rotate(${angle}deg)`;
+                // Needle Rotation Calculation (-135deg for 0 km/h to +135deg for 50 km/h)
+                const angle = -135 + (clamped / maxGaugeSpeed) * 270;
+                needle.style.transform = `rotate(${angle + 135}deg)`;
 
-                // Calculate Arc Fill
-                const offset = arcTotalLength - (clampedSpeed / maxGaugeSpeed) * (arcTotalLength * 0.75);
+                const offset = arcTotalLength - (clamped / maxGaugeSpeed) * arcTotalLength;
                 gaugeArc.style.strokeDashoffset = offset;
             }
 
-            // Restore Saved Stats
-            function updateSavedUI() {
+            function loadSavedStats() {
                 maxSpeedEl.textContent = maxSpeed.toFixed(1);
                 tripDistEl.textContent = tripDistance.toFixed(2);
                 
@@ -366,26 +336,25 @@
                     avgSpeedEl.textContent = "0.0";
                 }
             }
-            updateSavedUI();
+            loadSavedStats();
+            updateGauge(0);
 
-            // Smooth Loop for UI Updating
             function animateLoop() {
                 const diff = targetSpeed - currentSpeed;
-                if (Math.abs(diff) > 0.1) {
-                    currentSpeed += diff * 0.1;
+                if (Math.abs(diff) > 0.05) {
+                    currentSpeed += diff * 0.12;
                 } else {
                     currentSpeed = targetSpeed;
                 }
 
-                const displaySpeed = currentSpeed < 0.3 ? 0 : currentSpeed;
-                speedText.textContent = Math.round(displaySpeed);
-                setGaugeSpeed(displaySpeed);
+                const displaySpeed = currentSpeed < 0.2 ? 0 : currentSpeed;
+                speedText.textContent = displaySpeed.toFixed(1);
+                updateGauge(displaySpeed);
 
                 requestAnimationFrame(animateLoop);
             }
             requestAnimationFrame(animateLoop);
 
-            // Haversine Distance Calc
             function calculateDistance(lat1, lon1, lat2, lon2) {
                 const R = 6371000;
                 const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -396,7 +365,6 @@
                 return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             }
 
-            // GPS Success Callback
             function handlePosition(pos) {
                 const lat = pos.coords.latitude;
                 const lon = pos.coords.longitude;
@@ -404,9 +372,9 @@
                 const now = pos.timestamp;
 
                 gpsDot.classList.add('active');
-                gpsText.textContent = 'GPS READY';
+                gpsText.textContent = 'GPS ACTIVE';
 
-                if (accuracy > 70) return; // Ignore bad signals
+                if (accuracy > 60) return;
 
                 if (lastLat === null) {
                     lastLat = lat;
@@ -426,30 +394,26 @@
                     calculatedSpeed = (distM / timeS) * 3.6;
                 }
 
-                // Filter Walking Noise
                 if (distM < 0.4 && calculatedSpeed < 0.5) {
                     targetSpeed = 0;
                 } else {
                     targetSpeed = calculatedSpeed;
 
-                    // Update Distance
                     if (distM >= 0.4) {
                         tripDistance += (distM / 1000);
                         localStorage.setItem('ebh_trip_dist', tripDistance);
                         tripDistEl.textContent = tripDistance.toFixed(2);
                     }
 
-                    // Update Max Speed
                     if (calculatedSpeed > maxSpeed) {
                         maxSpeed = calculatedSpeed;
                         localStorage.setItem('ebh_max_speed', maxSpeed);
                         maxSpeedEl.textContent = maxSpeed.toFixed(1);
                     }
 
-                    // Update Average Speed
                     if (calculatedSpeed > 0.5) {
                         speedSamples.push(calculatedSpeed);
-                        if (speedSamples.length > 500) speedSamples.shift(); // keep array light
+                        if (speedSamples.length > 300) speedSamples.shift();
                         localStorage.setItem('ebh_speed_samples', JSON.stringify(speedSamples));
                         
                         const avg = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
@@ -467,10 +431,9 @@
                 gpsText.textContent = 'SEARCHING';
             }
 
-            // Start / Stop Functions
             function toggleTracking() {
                 if (!("geolocation" in navigator)) {
-                    alert("GPS not supported on your browser.");
+                    alert("GPS not supported.");
                     return;
                 }
 
@@ -496,7 +459,6 @@
                 }
             }
 
-            // Reset Function
             function resetAll() {
                 if (isTracking) toggleTracking();
                 
@@ -512,9 +474,9 @@
                 localStorage.removeItem('ebh_trip_dist');
                 localStorage.removeItem('ebh_speed_samples');
 
-                updateSavedUI();
-                speedText.textContent = "0";
-                setGaugeSpeed(0);
+                loadSavedStats();
+                speedText.textContent = "0.0";
+                updateGauge(0);
             }
 
             startBtn.addEventListener('click', toggleTracking);
