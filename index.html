@@ -28,7 +28,7 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 15px;
+            padding: 10px 15px 15px 15px;
             background: radial-gradient(circle at 50% 30%, #0c1622, #04080c 80%);
         }
 
@@ -37,11 +37,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px 10px;
+            padding: 2px 5px;
         }
 
         .brand-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
             letter-spacing: 2px;
             color: #00e5cc;
@@ -49,7 +49,7 @@
         }
 
         .gps-status {
-            font-size: 11px;
+            font-size: 10px;
             color: #5b6e82;
             display: flex;
             align-items: center;
@@ -59,8 +59,8 @@
         }
 
         .gps-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             background-color: #ff3366;
             border-radius: 50%;
         }
@@ -73,8 +73,9 @@
         .gauge-area {
             position: relative;
             width: 100%;
-            max-width: 420px;
-            height: 52vh;
+            max-width: 360px;
+            flex: 1;
+            max-height: 44vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -91,7 +92,7 @@
             stroke-width: 3.5;
             stroke-linecap: round;
             transform-origin: 150px 150px;
-            transition: transform 0.2s cubic-bezier(0.1, 0.6, 0.2, 1);
+            transition: transform 0.05s linear;
             filter: drop-shadow(0 0 8px #00e5cc);
         }
 
@@ -99,11 +100,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: -20px;
+            margin-top: -10px;
         }
 
         .speed-number {
-            font-size: 80px;
+            font-size: 64px;
             font-weight: 800;
             color: #00e5cc;
             line-height: 0.9;
@@ -111,28 +112,27 @@
         }
 
         .unit {
-            font-size: 13px;
+            font-size: 12px;
             color: #5b6e82;
             letter-spacing: 4px;
-            margin-top: 8px;
+            margin-top: 4px;
             font-weight: 700;
         }
 
         .bottom-section {
             width: 100%;
-            max-width: 420px;
+            max-width: 380px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-bottom: 10px;
+            gap: 10px;
         }
 
         .stats-panel {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             background: rgba(12, 22, 34, 0.6);
-            border-radius: 14px;
-            padding: 15px 5px;
+            border-radius: 12px;
+            padding: 10px 5px;
             border: 1px solid rgba(0, 229, 204, 0.08);
             text-align: center;
             backdrop-filter: blur(10px);
@@ -141,7 +141,7 @@
         .stat-box {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 3px;
             border-right: 1px solid rgba(255, 255, 255, 0.05);
         }
 
@@ -150,14 +150,14 @@
         }
 
         .stat-label {
-            font-size: 10px;
+            font-size: 9px;
             color: #5b6e82;
             letter-spacing: 2px;
             font-weight: 700;
         }
 
         .stat-value {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 700;
             color: #ffcc00;
         }
@@ -168,33 +168,33 @@
 
         .controls {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
         }
 
         .btn {
             flex: 1;
-            padding: 15px;
+            padding: 12px;
             border: none;
-            border-radius: 12px;
-            font-size: 13px;
+            border-radius: 10px;
+            font-size: 12px;
             font-weight: 800;
             letter-spacing: 2px;
             cursor: pointer;
             text-transform: uppercase;
-            transition: all 0.2s ease;
+            transition: all 0.1s ease;
         }
 
         .btn-start {
             background: #00e5cc;
             color: #04080c;
-            box-shadow: 0 0 20px rgba(0, 229, 204, 0.3);
+            box-shadow: 0 0 15px rgba(0, 229, 204, 0.3);
         }
 
         .btn-start.stop {
             background: #ff3366;
             color: #ffffff;
-            box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
         }
 
         .btn-reset {
@@ -234,7 +234,6 @@
                 
                 <path id="gaugeArc" d="M 40 230 A 130 130 0 1 1 260 230" fill="none" stroke="url(#gauge-grad)" stroke-width="12" stroke-linecap="round" stroke-dasharray="610" stroke-dashoffset="610"/>
 
-                <!-- 0 to 50 scale with step 5 -->
                 <text x="35" y="238" fill="#5b6e82" font-size="9" font-weight="700" text-anchor="middle">0</text>
                 <text x="25" y="195" fill="#5b6e82" font-size="9" font-weight="700" text-anchor="middle">5</text>
                 <text x="30" y="148" fill="#5b6e82" font-size="9" font-weight="700" text-anchor="middle">10</text>
@@ -247,7 +246,6 @@
                 <text x="270" y="148" fill="#ff3366" font-size="9" font-weight="700" text-anchor="middle">45</text>
                 <text x="265" y="238" fill="#ff3366" font-size="9" font-weight="700" text-anchor="middle">50</text>
 
-                <!-- Needle (Starts at exact 0 angle) -->
                 <line id="needle" class="needle" x1="150" y1="150" x2="58" y2="222" />
                 
                 <circle cx="150" cy="150" r="9" fill="#04080c" stroke="#00e5cc" stroke-width="3"/>
@@ -255,7 +253,7 @@
         </div>
 
         <div class="digital-display">
-            <div class="speed-number" id="speedText">0</div>
+            <div class="speed-number" id="speedText">0.0</div>
             <div class="unit">KM / H</div>
         </div>
 
@@ -311,13 +309,12 @@
             let lastLon = null;
             let lastTime = null;
 
-            const maxGaugeSpeed = 50; // Max speed set to 50 km/h
+            const maxGaugeSpeed = 50;
             const arcTotalLength = 610;
 
             function updateGauge(speed) {
                 const clamped = Math.min(Math.max(speed, 0), maxGaugeSpeed);
                 
-                // Needle Rotation Calculation (-135deg for 0 km/h to +135deg for 50 km/h)
                 const angle = -135 + (clamped / maxGaugeSpeed) * 270;
                 needle.style.transform = `rotate(${angle + 135}deg)`;
 
@@ -339,15 +336,16 @@
             loadSavedStats();
             updateGauge(0);
 
+            // ইন্সট্যান্ট রেসপন্সের জন্য এনিমেশন লুপ অত্যন্ত ফাস্ট করা হয়েছে
             function animateLoop() {
                 const diff = targetSpeed - currentSpeed;
-                if (Math.abs(diff) > 0.05) {
-                    currentSpeed += diff * 0.12;
+                if (Math.abs(diff) > 0.01) {
+                    currentSpeed += diff * 0.4; // রেসপন্স স্পিড দ্রুত করা হয়েছে
                 } else {
                     currentSpeed = targetSpeed;
                 }
 
-                const displaySpeed = currentSpeed < 0.2 ? 0 : currentSpeed;
+                const displaySpeed = currentSpeed < 0.1 ? 0 : currentSpeed;
                 speedText.textContent = displaySpeed.toFixed(1);
                 updateGauge(displaySpeed);
 
@@ -374,7 +372,7 @@
                 gpsDot.classList.add('active');
                 gpsText.textContent = 'GPS ACTIVE';
 
-                if (accuracy > 60) return;
+                if (accuracy > 80) return;
 
                 if (lastLat === null) {
                     lastLat = lat;
@@ -388,42 +386,39 @@
 
                 let calculatedSpeed = 0;
 
+                // তাত্ক্ষণিক গাড়ির স্পিড ডিটেকশন
                 if (pos.coords.speed !== null && pos.coords.speed >= 0) {
                     calculatedSpeed = pos.coords.speed * 3.6;
                 } else if (timeS > 0) {
                     calculatedSpeed = (distM / timeS) * 3.6;
                 }
 
-                if (distM < 0.4 && calculatedSpeed < 0.5) {
-                    targetSpeed = 0;
-                } else {
-                    targetSpeed = calculatedSpeed;
+                targetSpeed = calculatedSpeed;
 
-                    if (distM >= 0.4) {
-                        tripDistance += (distM / 1000);
-                        localStorage.setItem('ebh_trip_dist', tripDistance);
-                        tripDistEl.textContent = tripDistance.toFixed(2);
-                    }
-
-                    if (calculatedSpeed > maxSpeed) {
-                        maxSpeed = calculatedSpeed;
-                        localStorage.setItem('ebh_max_speed', maxSpeed);
-                        maxSpeedEl.textContent = maxSpeed.toFixed(1);
-                    }
-
-                    if (calculatedSpeed > 0.5) {
-                        speedSamples.push(calculatedSpeed);
-                        if (speedSamples.length > 300) speedSamples.shift();
-                        localStorage.setItem('ebh_speed_samples', JSON.stringify(speedSamples));
-                        
-                        const avg = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
-                        avgSpeedEl.textContent = avg.toFixed(1);
-                    }
-
-                    lastLat = lat;
-                    lastLon = lon;
-                    lastTime = now;
+                if (distM >= 0.2) {
+                    tripDistance += (distM / 1000);
+                    localStorage.setItem('ebh_trip_dist', tripDistance);
+                    tripDistEl.textContent = tripDistance.toFixed(2);
                 }
+
+                if (calculatedSpeed > maxSpeed) {
+                    maxSpeed = calculatedSpeed;
+                    localStorage.setItem('ebh_max_speed', maxSpeed);
+                    maxSpeedEl.textContent = maxSpeed.toFixed(1);
+                }
+
+                if (calculatedSpeed > 0.2) {
+                    speedSamples.push(calculatedSpeed);
+                    if (speedSamples.length > 300) speedSamples.shift();
+                    localStorage.setItem('ebh_speed_samples', JSON.stringify(speedSamples));
+                    
+                    const avg = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
+                    avgSpeedEl.textContent = avg.toFixed(1);
+                }
+
+                lastLat = lat;
+                lastLon = lon;
+                lastTime = now;
             }
 
             function handleError() {
@@ -450,7 +445,7 @@
                     watchId = navigator.geolocation.watchPosition(
                         handlePosition,
                         handleError,
-                        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+                        { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
                     );
                     isTracking = true;
                     startBtn.textContent = "STOP";
