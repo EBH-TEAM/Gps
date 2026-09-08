@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>স্পিড ও দূরত্ব ট্র্যাকার</title>
+    <title>স্পিড ট্র্যাকার প্রো</title>
     <style>
         * {
             margin: 0;
@@ -19,12 +19,11 @@
             justify-content: center;
             align-items: center;
             background: #070b12;
-            padding: 10px;
+            padding: 8px;
             overflow: hidden;
             position: relative;
         }
 
-        /* পটভূমিতে ডায়নামিক আরজিবি ইফেক্ট */
         body::before {
             content: '';
             position: fixed;
@@ -33,9 +32,8 @@
             width: 200%;
             height: 200%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(255,0,102,0.05), transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0,102,255,0.05), transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(255,204,0,0.03), transparent 70%);
+                radial-gradient(circle at 20% 80%, rgba(255,0,102,0.04), transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0,102,255,0.04), transparent 50%);
             animation: bgPulse 8s ease-in-out infinite alternate;
             z-index: 0;
             pointer-events: none;
@@ -49,22 +47,21 @@
         .container {
             width: 100%;
             max-width: 420px;
-            min-height: 95vh;
-            min-height: 95dvh;
+            min-height: 96vh;
+            min-height: 96dvh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             align-items: center;
-            padding: 15px 10px 12px;
+            padding: 10px 8px 8px;
             position: relative;
             z-index: 1;
             gap: 8px;
         }
 
-        /* ====== উপরের স্পিড কার্ড ====== */
+        /* ====== স্পিড কার্ড ====== */
         .speed-circle {
             width: 100%;
-            max-width: 340px;
+            max-width: 300px;
             aspect-ratio: 1/1;
             border-radius: 50%;
             display: flex;
@@ -74,10 +71,9 @@
             position: relative;
             background: radial-gradient(circle at 30% 30%, #141e33, #080e1a);
             transition: transform 0.3s ease;
-            margin-top: 5px;
+            margin-top: 2px;
         }
 
-        /* আরজিবি রানিং বর্ডার - স্পিড */
         .speed-circle::before {
             content: '';
             position: absolute;
@@ -145,22 +141,22 @@
         }
 
         .speed-circle .icon {
-            font-size: 38px;
+            font-size: 32px;
             margin-bottom: 2px;
             filter: drop-shadow(0 0 25px rgba(0, 180, 255, 0.2));
         }
 
         .speed-circle .label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             letter-spacing: 3px;
-            color: rgba(255, 255, 255, 0.35);
+            color: rgba(255, 255, 255, 0.3);
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .speed-circle .value {
-            font-size: 58px;
+            font-size: 52px;
             font-weight: 700;
             background: linear-gradient(135deg, #6dd5ff, #3a9bd5);
             -webkit-background-clip: text;
@@ -168,22 +164,41 @@
             background-clip: text;
             display: flex;
             align-items: baseline;
-            gap: 4px;
+            gap: 3px;
             line-height: 1;
             text-shadow: 0 0 60px rgba(0, 180, 255, 0.1);
         }
 
         .speed-circle .unit {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 400;
-            -webkit-text-fill-color: rgba(255, 255, 255, 0.25);
-            color: rgba(255, 255, 255, 0.25);
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.2);
         }
 
-        /* ====== নিচের দূরত্ব কার্ড ====== */
+        /* ====== ম্যাপ কন্টেইনার ====== */
+        .map-container {
+            width: 100%;
+            max-width: 340px;
+            height: 160px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            filter: invert(0.9) hue-rotate(180deg);
+        }
+
+        /* ====== দূরত্ব কার্ড ====== */
         .distance-circle {
             width: 100%;
-            max-width: 300px;
+            max-width: 240px;
             aspect-ratio: 1/1;
             border-radius: 50%;
             display: flex;
@@ -193,10 +208,8 @@
             position: relative;
             background: radial-gradient(circle at 30% 30%, #1a2e22, #0a1410);
             transition: transform 0.3s ease;
-            margin-bottom: 5px;
         }
 
-        /* আরজিবি রানিং বর্ডার - দূরত্ব (উল্টো দিকে) */
         .distance-circle::before {
             content: '';
             position: absolute;
@@ -264,22 +277,22 @@
         }
 
         .distance-circle .icon {
-            font-size: 34px;
+            font-size: 28px;
             margin-bottom: 2px;
             filter: drop-shadow(0 0 25px rgba(0, 255, 150, 0.15));
         }
 
         .distance-circle .label {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             letter-spacing: 3px;
-            color: rgba(255, 255, 255, 0.35);
+            color: rgba(255, 255, 255, 0.3);
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .distance-circle .value {
-            font-size: 50px;
+            font-size: 42px;
             font-weight: 700;
             background: linear-gradient(135deg, #7dffb3, #3dcc7a);
             -webkit-background-clip: text;
@@ -287,32 +300,32 @@
             background-clip: text;
             display: flex;
             align-items: baseline;
-            gap: 4px;
+            gap: 3px;
             line-height: 1;
             text-shadow: 0 0 60px rgba(0, 255, 150, 0.08);
         }
 
         .distance-circle .unit {
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 400;
-            -webkit-text-fill-color: rgba(255, 255, 255, 0.25);
-            color: rgba(255, 255, 255, 0.25);
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.2);
         }
 
-        /* ====== স্ট্যাটাস এলাকা ====== */
+        /* ====== স্ট্যাটাস ====== */
         .status-area {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
-            padding: 2px 0;
+            gap: 4px;
             width: 100%;
+            padding: 2px 0;
         }
 
         .status-text {
-            font-size: 12px;
+            font-size: 11px;
             color: rgba(255, 255, 255, 0.2);
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             text-align: center;
             font-weight: 300;
         }
@@ -325,76 +338,45 @@
             color: rgba(255, 150, 150, 0.5);
         }
 
-        /* আরজিবি ডটস - মোবাইল চার্জারের মতো */
         .rgb-dots {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
-            margin-top: 2px;
         }
 
         .rgb-dots span {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             display: inline-block;
             animation: dotCharge 1.6s ease-in-out infinite;
             box-shadow: 0 0 15px currentColor;
         }
 
-        .rgb-dots span:nth-child(1) { 
-            background: #ff0066; 
-            color: #ff0066;
-            animation-delay: 0s; 
-        }
-        .rgb-dots span:nth-child(2) { 
-            background: #ffcc00; 
-            color: #ffcc00;
-            animation-delay: 0.25s; 
-        }
-        .rgb-dots span:nth-child(3) { 
-            background: #33ff66; 
-            color: #33ff66;
-            animation-delay: 0.5s; 
-        }
-        .rgb-dots span:nth-child(4) { 
-            background: #0066ff; 
-            color: #0066ff;
-            animation-delay: 0.75s; 
-        }
-        .rgb-dots span:nth-child(5) { 
-            background: #9933ff; 
-            color: #9933ff;
-            animation-delay: 1s; 
-        }
+        .rgb-dots span:nth-child(1) { background: #ff0066; color: #ff0066; animation-delay: 0s; }
+        .rgb-dots span:nth-child(2) { background: #ffcc00; color: #ffcc00; animation-delay: 0.25s; }
+        .rgb-dots span:nth-child(3) { background: #33ff66; color: #33ff66; animation-delay: 0.5s; }
+        .rgb-dots span:nth-child(4) { background: #0066ff; color: #0066ff; animation-delay: 0.75s; }
+        .rgb-dots span:nth-child(5) { background: #9933ff; color: #9933ff; animation-delay: 1s; }
 
         @keyframes dotCharge {
-            0%, 100% { 
-                transform: scale(0.5); 
-                opacity: 0.15;
-                box-shadow: 0 0 5px currentColor;
-            }
-            50% { 
-                transform: scale(1.8); 
-                opacity: 1;
-                box-shadow: 0 0 25px currentColor, 0 0 50px currentColor;
-            }
+            0%, 100% { transform: scale(0.5); opacity: 0.15; box-shadow: 0 0 5px currentColor; }
+            50% { transform: scale(1.8); opacity: 1; box-shadow: 0 0 25px currentColor, 0 0 50px currentColor; }
         }
 
-        /* ====== বাটন এলাকা ====== */
+        /* ====== বাটন ====== */
         .button-area {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
             max-width: 340px;
             justify-content: center;
             align-items: center;
-            margin-top: 2px;
         }
 
         .btn-track {
-            padding: 12px 30px;
-            font-size: 13px;
+            padding: 10px 25px;
+            font-size: 12px;
             font-weight: 600;
             background: linear-gradient(135deg, #00b4db, #0083b0);
             border: none;
@@ -429,28 +411,14 @@
             filter: blur(6px);
         }
 
-        .btn-track:hover::before {
-            opacity: 0.5;
-        }
+        .btn-track:hover::before { opacity: 0.5; }
+        .btn-track:hover { transform: scale(1.03); box-shadow: 0 10px 40px rgba(0, 150, 255, 0.2); }
+        .btn-track:active { transform: scale(0.95); }
+        .btn-track.stop { background: linear-gradient(135deg, #f09819, #d35400); }
 
-        .btn-track:hover {
-            transform: scale(1.03);
-            box-shadow: 0 10px 40px rgba(0, 150, 255, 0.2);
-        }
-
-        .btn-track:active {
-            transform: scale(0.95);
-        }
-
-        .btn-track.stop {
-            background: linear-gradient(135deg, #f09819, #d35400);
-            box-shadow: 0 8px 30px rgba(255, 150, 0, 0.15);
-        }
-
-        /* রিসেট বাটন */
         .btn-reset {
-            padding: 12px 18px;
-            font-size: 16px;
+            padding: 10px 15px;
+            font-size: 15px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 50px;
@@ -461,7 +429,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 50px;
+            min-width: 44px;
         }
 
         .btn-reset:hover {
@@ -470,148 +438,72 @@
             color: #ff6b6b;
             transform: scale(1.05);
         }
-
-        .btn-reset:active {
-            transform: scale(0.9);
-        }
+        .btn-reset:active { transform: scale(0.9); }
 
         /* ====== রেসপন্সিভ ====== */
         @media (max-width: 420px) {
-            .speed-circle {
-                max-width: 280px;
-            }
-            .distance-circle {
-                max-width: 240px;
-            }
-            .speed-circle .value {
-                font-size: 44px;
-            }
-            .speed-circle .unit {
-                font-size: 16px;
-            }
-            .distance-circle .value {
-                font-size: 38px;
-            }
-            .distance-circle .unit {
-                font-size: 14px;
-            }
-            .speed-circle .icon {
-                font-size: 30px;
-            }
-            .distance-circle .icon {
-                font-size: 26px;
-            }
-            .btn-track {
-                padding: 10px 20px;
-                font-size: 11px;
-            }
-            .btn-reset {
-                padding: 10px 14px;
-                font-size: 14px;
-                min-width: 42px;
-            }
+            .speed-circle { max-width: 240px; }
+            .distance-circle { max-width: 190px; }
+            .speed-circle .value { font-size: 40px; }
+            .speed-circle .unit { font-size: 15px; }
+            .distance-circle .value { font-size: 34px; }
+            .distance-circle .unit { font-size: 13px; }
+            .speed-circle .icon { font-size: 26px; }
+            .distance-circle .icon { font-size: 22px; }
+            .map-container { height: 130px; max-width: 280px; }
+            .btn-track { padding: 8px 18px; font-size: 11px; }
+            .btn-reset { padding: 8px 12px; font-size: 13px; min-width: 38px; }
+            .status-text { font-size: 10px; }
+            .rgb-dots span { width: 6px; height: 6px; gap: 8px; }
         }
 
         @media (max-width: 360px) {
-            .speed-circle {
-                max-width: 220px;
-            }
-            .distance-circle {
-                max-width: 190px;
-            }
-            .speed-circle .value {
-                font-size: 34px;
-            }
-            .speed-circle .unit {
-                font-size: 13px;
-            }
-            .distance-circle .value {
-                font-size: 30px;
-            }
-            .distance-circle .unit {
-                font-size: 12px;
-            }
-            .speed-circle .icon {
-                font-size: 24px;
-            }
-            .distance-circle .icon {
-                font-size: 20px;
-            }
-            .speed-circle .label,
-            .distance-circle .label {
-                font-size: 10px;
-                letter-spacing: 2px;
-            }
-            .btn-track {
-                padding: 8px 16px;
-                font-size: 10px;
-                letter-spacing: 1px;
-            }
-            .btn-reset {
-                padding: 8px 12px;
-                font-size: 12px;
-                min-width: 36px;
-            }
-            .status-text {
-                font-size: 10px;
-            }
-            .rgb-dots span {
-                width: 6px;
-                height: 6px;
-                gap: 8px;
-            }
+            .speed-circle { max-width: 190px; }
+            .distance-circle { max-width: 150px; }
+            .speed-circle .value { font-size: 32px; }
+            .speed-circle .unit { font-size: 12px; }
+            .distance-circle .value { font-size: 28px; }
+            .distance-circle .unit { font-size: 11px; }
+            .speed-circle .icon { font-size: 20px; }
+            .distance-circle .icon { font-size: 18px; }
+            .map-container { height: 110px; max-width: 230px; }
+            .speed-circle .label, .distance-circle .label { font-size: 10px; letter-spacing: 2px; }
         }
 
         @media (max-height: 700px) {
-            .speed-circle {
-                max-width: 220px;
-            }
-            .distance-circle {
-                max-width: 190px;
-            }
-            .speed-circle .value {
-                font-size: 34px;
-            }
-            .distance-circle .value {
-                font-size: 30px;
-            }
-            .speed-circle .icon {
-                font-size: 24px;
-            }
-            .distance-circle .icon {
-                font-size: 20px;
-            }
-            .container {
-                padding: 8px 8px 6px;
-                gap: 4px;
-            }
-            .btn-track {
-                padding: 8px 16px;
-                font-size: 10px;
-            }
-            .btn-reset {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-            .status-text {
-                font-size: 10px;
-            }
+            .speed-circle { max-width: 190px; }
+            .distance-circle { max-width: 150px; }
+            .speed-circle .value { font-size: 32px; }
+            .distance-circle .value { font-size: 28px; }
+            .speed-circle .icon { font-size: 20px; }
+            .distance-circle .icon { font-size: 18px; }
+            .map-container { height: 110px; max-width: 250px; }
+            .btn-track { padding: 8px 16px; font-size: 10px; }
+            .btn-reset { padding: 8px 12px; font-size: 12px; }
+            .status-text { font-size: 10px; }
+            .container { padding: 6px 6px 4px; gap: 6px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
 
-        <!-- ====== স্পিড কার্ড ====== -->
-        <div class="speed-circle" id="speedCircle">
+        <!-- ====== স্পিড ====== -->
+        <div class="speed-circle">
             <div class="inner-bg"></div>
             <div class="content">
                 <div class="icon">🚀</div>
                 <div class="label">স্পিড</div>
-                <div class="value" id="speedDisplay">
-                    0.0 <span class="unit">km/h</span>
-                </div>
+                <div class="value" id="speedDisplay">0.0 <span class="unit">km/h</span></div>
             </div>
+        </div>
+
+        <!-- ====== ম্যাপ ====== -->
+        <div class="map-container">
+            <iframe id="mapFrame" 
+                src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14600!2d90.3563!3d23.7772!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1700000000000" 
+                allowfullscreen loading="lazy">
+            </iframe>
         </div>
 
         <!-- ====== স্ট্যাটাস ====== -->
@@ -622,19 +514,17 @@
             </div>
         </div>
 
-        <!-- ====== দূরত্ব কার্ড ====== -->
-        <div class="distance-circle" id="distanceCircle">
+        <!-- ====== দূরত্ব ====== -->
+        <div class="distance-circle">
             <div class="inner-bg"></div>
             <div class="content">
                 <div class="icon">📍</div>
                 <div class="label">দূরত্ব</div>
-                <div class="value" id="distanceDisplay">
-                    0.00 <span class="unit">km</span>
-                </div>
+                <div class="value" id="distanceDisplay">0.00 <span class="unit">km</span></div>
             </div>
         </div>
 
-        <!-- ====== বাটন এলাকা ====== -->
+        <!-- ====== বাটন ====== -->
         <div class="button-area">
             <button class="btn-track" id="trackBtn">▶ শুরু</button>
             <button class="btn-reset" id="resetBtn" title="রিসেট">↺</button>
@@ -646,26 +536,25 @@
         (function() {
             "use strict";
 
-            // DOM এলিমেন্ট
             const speedEl = document.getElementById('speedDisplay');
             const distanceEl = document.getElementById('distanceDisplay');
             const trackBtn = document.getElementById('trackBtn');
             const resetBtn = document.getElementById('resetBtn');
             const statusText = document.getElementById('statusText');
+            const mapFrame = document.getElementById('mapFrame');
 
-            // স্টেট
+            // ====== ভেরিয়েবল ======
             let lastLat = null;
             let lastLon = null;
             let totalDistance = 0;
             let watchId = null;
             let isTracking = false;
             let lastSpeed = 0;
-            let isFirstLoad = true;
-
-            // লোকাল স্টোরেজ কী
+            let speedFilter = []; // স্পিড ফিল্টারের জন্য
+            const FILTER_SIZE = 5;
             const STORAGE_KEY = 'speedTrackerData';
 
-            // ====== লোকাল স্টোরেজ ফাংশন ======
+            // ====== লোকাল স্টোরেজ ======
             function saveData() {
                 try {
                     const data = {
@@ -676,9 +565,7 @@
                         timestamp: Date.now()
                     };
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-                } catch (e) {
-                    console.warn('Save failed:', e);
-                }
+                } catch(e) { console.warn('Save failed:', e); }
             }
 
             function loadData() {
@@ -691,21 +578,26 @@
                     lastLon = data.lastLon || null;
                     lastSpeed = data.lastSpeed || 0;
                     return true;
-                } catch (e) {
-                    console.warn('Load failed:', e);
-                    return false;
-                }
+                } catch(e) { return false; }
             }
 
             function clearData() {
-                try {
-                    localStorage.removeItem(STORAGE_KEY);
-                } catch (e) {
-                    console.warn('Clear failed:', e);
-                }
+                try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
             }
 
-            // ====== হ্যাভারসাইন দূরত্ব ======
+            // ====== ফিল্টার ======
+            function getFilteredSpeed(newSpeed) {
+                speedFilter.push(newSpeed);
+                if (speedFilter.length > FILTER_SIZE) {
+                    speedFilter.shift();
+                }
+                // মিডিয়ান ফিল্টার - আউটলায়ার রিমুভ
+                const sorted = [...speedFilter].sort((a, b) => a - b);
+                const mid = Math.floor(sorted.length / 2);
+                return sorted[mid];
+            }
+
+            // ====== দূরত্ব ক্যালকুলেশন ======
             function calculateDistance(lat1, lon1, lat2, lon2) {
                 const R = 6371;
                 const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -715,6 +607,14 @@
                           Math.sin(dLon/2) * Math.sin(dLon/2);
                 const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
                 return R * c;
+            }
+
+            // ====== ম্যাপ আপডেট ======
+            function updateMap(lat, lon) {
+                if (!lat || !lon) return;
+                // গুগল ম্যাপ এম্বেড URL আপডেট
+                const url = `https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14600!2d${lon}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1700000000000`;
+                mapFrame.src = url;
             }
 
             // ====== UI আপডেট ======
@@ -737,30 +637,50 @@
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 const speedMps = position.coords.speed;
+                const accuracy = position.coords.accuracy;
 
-                let speedKmH = 0;
-                if (speedMps !== null && speedMps >= 0) {
-                    speedKmH = speedMps * 3.6;
-                    lastSpeed = speedKmH;
-                } else {
-                    speedKmH = lastSpeed;
+                // GPS একুরেসি চেক (যদি ৫০ মিটারের বেশি হয় তাহলে ইগনোর)
+                if (accuracy > 50) {
+                    statusText.textContent = '⚠️ GPS সিগন্যাল দুর্বল';
+                    statusText.className = 'status-text error';
+                    return;
                 }
 
+                // স্পিড ফিল্টার
+                let rawSpeed = 0;
+                if (speedMps !== null && speedMps >= 0) {
+                    rawSpeed = speedMps * 3.6;
+                }
+
+                // ফিল্টার প্রয়োগ
+                let filteredSpeed = getFilteredSpeed(rawSpeed);
+                
+                // যদি গতি 0.5 km/h এর কম হয় তাহলে 0 দেখাও (নয়েজ ফিল্টার)
+                if (filteredSpeed < 0.5) {
+                    filteredSpeed = 0;
+                }
+
+                // দূরত্ব হিসাব
                 if (lastLat !== null && lastLon !== null) {
                     const dist = calculateDistance(lastLat, lastLon, lat, lon);
-                    if (dist > 0.003) { // ৩ মিটার নয়েজ ফিল্টার
+                    // শুধু মাত্র যদি গতি > 0.5 km/h হয় তাহলে দূরত্ব যোগ করো
+                    if (filteredSpeed > 0.5 && dist > 0.003) {
                         totalDistance += dist;
                     }
                 }
 
                 lastLat = lat;
                 lastLon = lon;
+                lastSpeed = filteredSpeed;
 
-                updateUI(speedKmH, totalDistance);
-                statusText.textContent = '✅ ট্র্যাকিং সচল';
+                // ম্যাপ আপডেট
+                updateMap(lat, lon);
+
+                // UI আপডেট
+                updateUI(filteredSpeed, totalDistance);
+                statusText.textContent = `📍 ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
                 statusText.className = 'status-text active';
                 
-                // সেভ
                 saveData();
             }
 
@@ -794,7 +714,7 @@
                     {
                         enableHighAccuracy: true,
                         maximumAge: 0,
-                        timeout: 8000
+                        timeout: 10000
                     }
                 );
 
@@ -818,27 +738,24 @@
                 saveData();
             }
 
-            // ====== রিসেট ফাংশন ======
+            // ====== রিসেট ======
             function resetAll() {
-                if (isTracking) {
-                    stopTracking();
-                }
+                if (isTracking) stopTracking();
                 
-                // ডাটা রিসেট
                 totalDistance = 0;
                 lastLat = null;
                 lastLon = null;
                 lastSpeed = 0;
+                speedFilter = [];
                 
-                // UI আপডেট
                 updateUI(0, 0);
                 statusText.textContent = '🔄 রিসেট করা হয়েছে';
                 statusText.className = 'status-text';
-                
-                // লোকাল স্টোরেজ ক্লিয়ার
                 clearData();
                 
-                // ২ সেকেন্ড পর মেসেজ পরিবর্তন
+                // ম্যাপ রিসেট (ঢাকার সেন্টার)
+                mapFrame.src = 'https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14600!2d90.3563!3d23.7772!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1700000000000';
+                
                 setTimeout(() => {
                     if (!isTracking) {
                         statusText.textContent = '🛰️ শুরু করতে বাটনে ক্লিক করুন';
@@ -847,13 +764,16 @@
                 }, 2000);
             }
 
-            // ====== লোড হলে আগের ডাটা রিস্টোর ======
+            // ====== রিস্টোর ======
             function restoreData() {
                 if (loadData()) {
                     updateUI(lastSpeed, totalDistance);
                     if (totalDistance > 0 || lastSpeed > 0) {
-                        statusText.textContent = '💾 আগের ডাটা রিস্টোর করা হয়েছে';
+                        statusText.textContent = '💾 আগের ডাটা রিস্টোর';
                         statusText.className = 'status-text';
+                        if (lastLat && lastLon) {
+                            updateMap(lastLat, lastLon);
+                        }
                         setTimeout(() => {
                             if (!isTracking) {
                                 statusText.textContent = '🛰️ শুরু করতে বাটনে ক্লিক করুন';
@@ -864,21 +784,16 @@
                 }
             }
 
-            // ====== ইভেন্ট লিসেনার ======
+            // ====== ইভেন্ট ======
             trackBtn.addEventListener('click', startTracking);
             resetBtn.addEventListener('click', resetAll);
 
-            // পেজ আনলোডে সেভ
             window.addEventListener('beforeunload', function() {
-                if (isTracking) {
-                    saveData();
-                }
-                if (watchId !== null) {
-                    navigator.geolocation.clearWatch(watchId);
-                }
+                if (isTracking) saveData();
+                if (watchId !== null) navigator.geolocation.clearWatch(watchId);
             });
 
-            // ====== ইনিশিয়ালাইজ ======
+            // ====== শুরু ======
             restoreData();
             if (!isTracking) {
                 updateUI(0, 0);
