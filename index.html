@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>স্পিড ট্র্যাকার প্রো - ১০০% অ্যাকুরেট</title>
+    <title>স্পিড ট্র্যাকার প্রো - আলটিমেট স্মুথ</title>
     <style>
         * {
             margin: 0;
@@ -56,20 +56,6 @@
             z-index: 0;
             pointer-events: none;
             overflow: hidden;
-        }
-
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.03);
-            animation: float linear infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
         }
 
         .container {
@@ -521,12 +507,6 @@
             let watchId = null;
             let isTracking = false;
 
-            // গুগল ম্যাপের মত ক্যালমান ফিল্টার ভেরিয়েবল
-            let kalmanSpeed = 0;
-            let kalmanP = 1; // অনুমান অনিশ্চয়তা
-            const kalmanQ = 0.03; // প্রসেস নয়েজ (স্মুথনেস কন্ট্রোল)
-            const kalmanR = 0.8;  // মেজারমেন্ট নয়েজ (GPS লাফালাফি প্রতিরোধক)
-
             let targetSpeed = 0;
             let currentDisplaySpeed = 0;
             let targetDistance = parseFloat(localStorage.getItem('speed_tracker_distance')) || 0;
@@ -535,37 +515,41 @@
             let lastLat = null;
             let lastLon = null;
             let lastTime = null;
-            let lastGpsPacketTime = Date.now();
+            let lastValidMovementTime = Date.now();
 
-            // ১-ডি ক্যালমান ফিল্টার অ্যালগরিদম
-            function updateKalmanFilter(measurement) {
-                kalmanP = kalmanP + kalmanQ;
-                const K = kalmanP / (kalmanP + kalmanR);
-                kalmanSpeed = kalmanSpeed + K * (measurement - kalmanSpeed);
-                kalmanP = (1 - K) * kalmanP;
-                return kalmanSpeed;
+            // লাফালাফি রোধে ৩টি ডাটা পয়েন্টের মুভিং এভারেজ
+            let speedHistory = [];
+
+            function getAverageSpeed(newSpeed) {
+                speedHistory.push(newSpeed);
+                if (speedHistory.length > 3) {
+                    speedHistory.shift();
+                }
+                const sum = speedHistory.reduce((a, b) => a + b, 0);
+                return sum / speedHistory.length;
             }
 
-            // গুগল ম্যাপস ইন্টারপোলেশন ও স্মুথিং রেন্ডারিং লুপ
+            // স্মুথ রেন্ডারিং লুপ (গুগল ম্যাপ স্টাইল)
             function animateLoop() {
                 const now = Date.now();
-                // যদি ৩ সেকেন্ড কোনো GPS সিগন্যাল না আসে, তবে স্পিড আস্তে আস্তে ০-তে নামবে (হঠাৎ লাফ দিয়ে ০ হবে না)
-                if (now - lastGpsPacketTime > 3000 && targetSpeed > 0) {
-                    targetSpeed = Math.max(0, targetSpeed - 0.2);
+
+                // কেবল ১০ সেকেন্ড কোনো মুভমেন্ট না থাকলে গতি আস্তে আস্তে জিরো করা হবে
+                if (now - lastValidMovementTime > 10000 && targetSpeed > 0) {
+                    targetSpeed = Math.max(0, targetSpeed - 0.1);
                 }
 
-                // গতি মসৃণভাবে পরিবর্তন
+                // গতি মসৃণভাবে পরিবর্তন (গুগল ম্যাপের মতো রিডিং কানেক্টেড থাকবে)
                 const diff = targetSpeed - currentDisplaySpeed;
-                if (Math.abs(diff) > 0.05) {
-                    currentDisplaySpeed += diff * 0.05; // মসৃণ ট্রানজিশন
+                if (Math.abs(diff) > 0.02) {
+                    currentDisplaySpeed += diff * 0.08;
                 } else {
                     currentDisplaySpeed = targetSpeed;
                 }
 
-                // দূরত্ব ফিল্টারিং
+                // দূরত্ব হিসাব
                 const distDiff = targetDistance - currentDisplayDistance;
                 if (Math.abs(distDiff) > 0.0001) {
-                    currentDisplayDistance += distDiff * 0.08;
+                    currentDisplayDistance += distDiff * 0.05;
                 } else {
                     currentDisplayDistance = targetDistance;
                 }
@@ -606,11 +590,9 @@
                 const lon = position.coords.longitude;
                 const accuracy = position.coords.accuracy;
                 const currentTime = position.timestamp;
-                lastGpsPacketTime = Date.now();
 
-                if (accuracy > 60) {
-                    statusText.textContent = '⚠️ দুর্বল জিপিএস সংকেত...';
-                    statusText.className = 'status-text error';
+                // দুর্বল সংকেতেও ড্রপ করবে না (টলারেন্স ৮০ মিটার)
+                if (accuracy > 80) {
                     return;
                 }
 
@@ -625,29 +607,24 @@
                 const timeS = (currentTime - lastTime) / 1000;
 
                 let rawSpeed = 0;
-                if (position.coords.speed !== null && position.coords.speed >= 0) {
+                
+                // ১. ডিভাইস জিপিএস স্পিড চেক
+                if (position.coords.speed !== null && position.coords.speed > 0) {
                     rawSpeed = position.coords.speed * 3.6;
-                } else if (timeS > 0) {
+                } 
+                // ২. ম্যানুয়াল দূরত্ব/সময় দিয়ে গতি হিসাব
+                else if (timeS > 0) {
                     rawSpeed = (distM / timeS) * 3.6;
                 }
 
-                // নয়েজ এবং ড্রিপ্ট ডি-বাউন্স (১ মিটারের কম নড়াচড়া জিপিএস ড্রিপ্ট হিসেবে ফিল্টার হবে)
-                if (distM < 1.0 && rawSpeed < 0.5) {
-                    rawSpeed = 0;
-                }
+                // গতি যদি ০.২ কিমির বেশি হয়, তবেই রানিং গতি আপডেট হবে
+                if (rawSpeed >= 0.2 || distM >= 0.3) {
+                    const smoothSpeed = getAverageSpeed(rawSpeed);
+                    targetSpeed = smoothSpeed;
+                    lastValidMovementTime = Date.now();
 
-                // ক্যালমান ফিল্টার দিয়ে ডাটা স্মুথ করা
-                const filteredSpeed = updateKalmanFilter(rawSpeed);
-
-                if (filteredSpeed <= 0.3) {
-                    targetSpeed = 0;
-                    statusText.textContent = '🅿️ অবস্থান স্থির (০.০)';
-                    statusText.className = 'status-text';
-                } else {
-                    targetSpeed = filteredSpeed;
-                    
-                    // নির্ভুল দূরত্ব যোগ
-                    if (distM >= 1.0) {
+                    // দূরত্বের সঠিক আপডেট
+                    if (distM >= 0.3) {
                         targetDistance += (distM / 1000);
                         localStorage.setItem('speed_tracker_distance', targetDistance.toString());
                     }
@@ -666,9 +643,8 @@
             }
 
             function handleError() {
-                statusText.textContent = '⚠️ GPS সংকেত পাওয়া যাচ্ছে না';
+                statusText.textContent = '⚠️ GPS সংকেত খোঁজা হচ্ছে...';
                 statusText.className = 'status-text error';
-                targetSpeed = 0;
             }
 
             function startTracking() {
@@ -685,14 +661,14 @@
                 watchId = navigator.geolocation.watchPosition(
                     handlePosition,
                     handleError,
-                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                    { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
                 );
 
                 isTracking = true;
                 trackBtn.textContent = '⏹ থামান';
                 trackBtn.className = 'btn-track stop';
-                statusText.textContent = '📡 স্যাটেলাইট কানেক্ট হচ্ছে...';
-                statusText.className = 'status-text';
+                statusText.textContent = '📡 ট্র্যাকিং রানিং আছে...';
+                statusText.className = 'status-text active';
             }
 
             function stopTracking() {
@@ -702,7 +678,7 @@
                 }
                 isTracking = false;
                 targetSpeed = 0;
-                kalmanSpeed = 0;
+                speedHistory = [];
                 trackBtn.textContent = '▶ শুরু';
                 trackBtn.className = 'btn-track';
                 statusText.textContent = '⏸ ট্র্যাকিং বন্ধ';
@@ -715,7 +691,7 @@
                 currentDisplayDistance = 0;
                 targetSpeed = 0;
                 currentDisplaySpeed = 0;
-                kalmanSpeed = 0;
+                speedHistory = [];
                 lastLat = null;
                 lastLon = null;
                 lastTime = null;
