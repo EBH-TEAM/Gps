@@ -1,455 +1,675 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBH Speed Meter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মেইল ও পাসওয়ার্ড এক্সট্রাক্টর</title>
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            user-select: none;
         }
 
-        html, body {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #eee;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .input-section {
+            background: #0f3460;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        textarea {
             width: 100%;
-            height: 100%;
-            background-color: #04080c;
-            color: #ffffff;
-            overflow: hidden;
+            height: 130px;
+            padding: 15px;
+            border: 2px solid #1a1a2e;
+            border-radius: 8px;
+            background: #16213e;
+            color: #eee;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.3s;
+            font-family: monospace;
         }
 
-        .app-container {
-            width: 100vw;
-            height: 100vh;
+        textarea:focus {
+            border-color: #00d4ff;
+        }
+
+        textarea::placeholder {
+            color: #666;
+        }
+
+        .btn-group {
             display: flex;
-            flex-direction: column;
-            justify-content: flex-start; /* উপাদানগুলোকে ওপরের দিকে চেপে রাখবে */
-            align-items: center;
-            padding: 10px 12px 20px 12px;
-            gap: 0px; /* অতিরিক্ত গ্যাপ বন্ধ করা হয়েছে */
-            background: radial-gradient(circle at 50% 30%, #0c1622, #04080c 80%);
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
         }
 
-        /* Top Bar Section */
-        .top-section {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 2;
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .top-bar {
-            width: 100%;
+        .btn-process {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #1a1a2e;
+        }
+
+        .btn-process:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-clear {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-clear-copies {
+            background: #f39c12;
+            color: #1a1a2e;
+        }
+
+        .btn-clear-copies:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(243, 156, 18, 0.4);
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .result-card {
+            background: #0f3460;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #00d4ff;
+            animation: fadeIn 0.4s ease;
+            position: relative;
+        }
+
+        .result-card.fully-copied {
+            border-left-color: #2ecc71;
+            background: linear-gradient(135deg, #0f3460, #1e5631);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 2px;
-            height: 25px;
         }
 
-        .brand-name {
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            color: #00e5cc;
-            text-shadow: 0 0 8px rgba(0, 229, 204, 0.4);
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: #1a1a2e;
+            color: #888;
         }
 
-        .top-right-controls {
+        .status-badge.done {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .result-row {
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 8px;
         }
 
-        .gps-status {
-            font-size: 10px;
-            color: #5b6e82;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            letter-spacing: 1px;
-            font-weight: 600;
+        .result-row:last-child {
+            margin-bottom: 0;
         }
 
-        .gps-dot {
-            width: 7px;
-            height: 7px;
-            background-color: #ff3366;
-            border-radius: 50%;
+        .label {
+            font-size: 0.8rem;
+            color: #aaa;
+            min-width: 80px;
+            font-weight: bold;
         }
 
-        .gps-dot.active {
-            background-color: #00e5cc;
-            box-shadow: 0 0 10px #00e5cc;
-        }
-
-        .btn-reset-top {
-            background: rgba(255, 255, 255, 0.08);
-            color: #a0b2c6;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 4px 10px;
+        .value-box {
+            flex: 1;
+            padding: 10px 14px;
+            background: #16213e;
             border-radius: 6px;
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 1px;
             cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        .btn-reset-top:active {
-            color: #ffffff;
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        /* Stats Panel Moved To The Top Empty Space */
-        .stats-panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            background: rgba(12, 22, 34, 0.7);
-            border-radius: 10px;
-            padding: 8px 4px;
-            border: 1px solid rgba(0, 229, 204, 0.08);
-            text-align: center;
-            backdrop-filter: blur(10px);
-            margin-top: 2px;
-        }
-
-        .stat-box {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .stat-box:last-child {
-            border-right: none;
-        }
-
-        .stat-label {
-            font-size: 9px;
-            color: #5b6e82;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-
-        .stat-value {
-            font-size: 15px;
-            font-weight: 700;
-            color: #ffcc00;
-        }
-
-        .stat-value.cyan {
-            color: #00e5cc;
-        }
-
-        /* Gauge Area Fixed To Shift Upwards */
-        .gauge-area {
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            word-break: break-all;
+            border: 2px solid transparent;
+            user-select: none;
             position: relative;
-            width: 100%;
-            max-width: 480px;
-            height: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 200px; /* মিটারকে সরাসরি ওপরের প্যানেলের দিকে টেনে তোলা হয়েছে */
+            padding-right: 40px;
         }
 
-        .gauge-svg {
-            width: 100%;
-            height: auto;
-            max-height: 70vh;
-            overflow: visible;
+        .value-box:hover {
+            background: #1a2a4a;
+            border-color: #00d4ff;
         }
 
-        .needle {
-            stroke: #00e5cc;
-            stroke-width: 3.5;
-            stroke-linecap: round;
-            transform-origin: 150px 135px;
-            transition: transform 0.05s linear;
-            filter: drop-shadow(0 0 8px #00e5cc);
+        .value-box.copied {
+            background: #1e5631;
+            border-color: #2ecc71;
+            color: #2ecc71;
         }
 
-        .digital-display {
+        .value-box.copied .copy-icon {
+            display: none;
+        }
+
+        .value-box.copied::after {
+            content: '✓';
             position: absolute;
-            bottom: 12%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: #2ecc71;
+            font-weight: bold;
         }
 
-        .speed-number {
-            font-size: 65px;
-            font-weight: 800;
-            color: #00e5cc;
-            line-height: 0.8;
-            text-shadow: 0 0 20px rgba(0, 229, 204, 0.4);
+        .copy-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            opacity: 0.6;
         }
 
-        .unit {
-            font-size: 10px;
-            color: #5b6e82;
-            letter-spacing: 3px;
-            margin-top: 2px;
-            font-weight: 700;
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .count-badge {
+            display: inline-block;
+            background: #00d4ff;
+            color: #1a1a2e;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            margin-right: 8px;
+        }
+
+        .count-badge.copied-badge {
+            background: #2ecc71;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #2ecc71;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .info-text {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .save-indicator {
+            font-size: 0.75rem;
+            color: #2ecc71;
+            text-align: center;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.3rem; }
+            .result-row { flex-direction: column; align-items: stretch; }
+            .label { min-width: auto; }
+            .value-box { font-size: 0.85rem; }
+            .label { font-size: 0.75rem; }
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>📧 মেইল ও পাসওয়ার্ড এক্সট্রাক্টর</h1>
 
-    <div class="app-container">
-        <!-- Top Section with Details -->
-        <div class="top-section">
-            <div class="top-bar">
-                <div class="brand-name">EBH SPEED METER</div>
-                <div class="top-right-controls">
-                    <div class="gps-status">
-                        <div class="gps-dot" id="gpsDot"></div>
-                        <span id="gpsText">GPS OFF</span>
-                    </div>
-                    <button class="btn-reset-top" id="resetBtn">RESET</button>
-                </div>
+        <div class="input-section">
+            <textarea id="inputData" placeholder="এখানে আপনার ডেটা পেস্ট করুন...&#10;ফরম্যাট: email|password|link&#10;প্রতি লাইনে একটি এন্ট্রি"></textarea>
+            <div class="btn-group">
+                <button class="btn-process" onclick="processData()">➕ অ্যাড করুন</button>
+                <button class="btn-clear-copies" onclick="clearCopyStatus()">🔄 কপি স্ট্যাটাস রিসেট</button>
+                <button class="btn-clear" onclick="clearAll()">🗑️ সব মুছুন</button>
             </div>
-
-            <div class="stats-panel">
-                <div class="stat-box">
-                    <div class="stat-label">AVG</div>
-                    <div class="stat-value" id="avgSpeed">0.0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">MAX</div>
-                    <div class="stat-value" id="maxSpeed">0.0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">TRIP</div>
-                    <div class="stat-value cyan" id="tripDist">0.00</div>
-                </div>
-            </div>
+            <div class="save-indicator" id="saveIndicator">💾 স্বয়ংক্রিয়ভাবে সেভ হয়েছে</div>
         </div>
 
-        <!-- Meter Gauge Base shifted UP -->
-        <div class="gauge-area">
-            <svg class="gauge-svg" viewBox="10 35 280 200">
-                <defs>
-                    <linearGradient id="gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#00e5cc" />
-                        <stop offset="60%" stop-color="#ffcc00" />
-                        <stop offset="100%" stop-color="#ff3366" />
-                    </linearGradient>
-                </defs>
-
-                <path d="M 30 210 A 130 130 0 1 1 270 210" fill="none" stroke="#101924" stroke-width="14" stroke-linecap="round"/>
-                
-                <path id="gaugeArc" d="M 30 210 A 130 130 0 1 1 270 210" fill="none" stroke="url(#gauge-grad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="610" stroke-dashoffset="610"/>
-
-                <text x="25" y="218" fill="#5b6e82" font-size="10" font-weight="700" text-anchor="middle">0</text>
-                <text x="18" y="170" fill="#5b6e82" font-size="10" font-weight="700" text-anchor="middle">5</text>
-                <text x="25" y="120" fill="#5b6e82" font-size="10" font-weight="700" text-anchor="middle">10</text>
-                <text x="48" y="75" fill="#5b6e82" font-size="10" font-weight="700" text-anchor="middle">15</text>
-                <text x="82" y="42" fill="#5b6e82" font-size="10" font-weight="700" text-anchor="middle">20</text>
-                <text x="126" y="24" fill="#5b6e82" font-size="10" font-weight="700" text-anchor="middle">25</text>
-                <text x="174" y="24" fill="#ffcc00" font-size="10" font-weight="700" text-anchor="middle">30</text>
-                <text x="218" y="42" fill="#ffcc00" font-size="10" font-weight="700" text-anchor="middle">35</text>
-                <text x="252" y="75" fill="#ff3366" font-size="10" font-weight="700" text-anchor="middle">40</text>
-                <text x="275" y="120" fill="#ff3366" font-size="10" font-weight="700" text-anchor="middle">45</text>
-                <text x="275" y="218" fill="#ff3366" font-size="10" font-weight="700" text-anchor="middle">50</text>
-
-                <line id="needle" class="needle" x1="150" y1="135" x2="58" y2="207" />
-                
-                <circle cx="150" cy="135" r="9" fill="#04080c" stroke="#00e5cc" stroke-width="3"/>
-            </svg>
-
-            <div class="digital-display">
-                <div class="speed-number" id="speedText">0.0</div>
-                <div class="unit">KM / H</div>
+        <div id="results" class="results-section">
+            <div>
+                <span id="countBadge" class="count-badge"></span>
+                <span id="copiedBadge" class="count-badge copied-badge"></span>
             </div>
+            <div id="resultList"></div>
         </div>
     </div>
 
+    <div id="toast" class="toast">✓ কপি হয়েছে!</div>
+
     <script>
-        (function() {
-            "use strict";
+        // localStorage কী
+        const STORAGE_KEY = 'emailPasswordData';
+        const COPIED_KEY = 'emailPasswordCopied';
 
-            const speedText = document.getElementById('speedText');
-            const avgSpeedEl = document.getElementById('avgSpeed');
-            const maxSpeedEl = document.getElementById('maxSpeed');
-            const tripDistEl = document.getElementById('tripDist');
-            const resetBtn = document.getElementById('resetBtn');
-            const gpsDot = document.getElementById('gpsDot');
-            const gpsText = document.getElementById('gpsText');
-            const needle = document.getElementById('needle');
-            const gaugeArc = document.getElementById('gaugeArc');
+        // কপি করা আইটেম ট্র্যাক করার জন্য Set
+        let copiedItems = new Set();
 
-            let watchId = null;
+        // ডেটা লোড করা
+        let savedData = [];
 
-            let currentSpeed = 0;
-            let targetSpeed = 0;
+        // ============ লোড ফাংশন ============
+        function loadFromStorage() {
+            try {
+                const dataStr = localStorage.getItem(STORAGE_KEY);
+                const copiedStr = localStorage.getItem(COPIED_KEY);
 
-            let maxSpeed = parseFloat(localStorage.getItem('ebh_max_speed')) || 0;
-            let tripDistance = parseFloat(localStorage.getItem('ebh_trip_dist')) || 0;
-            let speedSamples = JSON.parse(localStorage.getItem('ebh_speed_samples')) || [];
+                if (dataStr) {
+                    savedData = JSON.parse(dataStr);
+                }
 
-            let lastLat = null;
-            let lastLon = null;
-            let lastTime = null;
+                if (copiedStr) {
+                    const arr = JSON.parse(copiedStr);
+                    copiedItems = new Set(arr);
+                }
 
-            const maxGaugeSpeed = 50;
-            const arcTotalLength = 610;
+                if (savedData.length > 0) {
+                    renderResults(savedData);
+                }
+            } catch (e) {
+                console.error('লোড এরর:', e);
+            }
+        }
 
-            function updateGauge(speed) {
-                const clamped = Math.min(Math.max(speed, 0), maxGaugeSpeed);
-                
-                const angle = -135 + (clamped / maxGaugeSpeed) * 270;
-                needle.style.transform = `rotate(${angle + 135}deg)`;
+        // ============ সেভ ফাংশন ============
+        function saveToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+                localStorage.setItem(COPIED_KEY, JSON.stringify([...copiedItems]));
+                showSaveIndicator();
+            } catch (e) {
+                console.error('সেভ এরর:', e);
+            }
+        }
 
-                const offset = arcTotalLength - (clamped / maxGaugeSpeed) * arcTotalLength;
-                gaugeArc.style.strokeDashoffset = offset;
+        function showSaveIndicator() {
+            const indicator = document.getElementById('saveIndicator');
+            indicator.classList.add('show');
+            clearTimeout(indicator._timeout);
+            indicator._timeout = setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 1500);
+        }
+
+        // ============ ডেটা প্রসেস ============
+        function processData() {
+            const input = document.getElementById('inputData').value.trim();
+
+            if (!input) {
+                alert('অনুগ্রহ করে কিছু ডেটা পেস্ট করুন!');
+                return;
             }
 
-            function loadSavedStats() {
-                maxSpeedEl.textContent = maxSpeed.toFixed(1);
-                tripDistEl.textContent = tripDistance.toFixed(2);
-                
-                if (speedSamples.length > 0) {
-                    const avg = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
-                    avgSpeedEl.textContent = avg.toFixed(1);
+            const lines = input.split('\n').filter(line => line.trim() !== '');
+            let addedCount = 0;
+            let duplicateCount = 0;
+
+            lines.forEach((line) => {
+                const parts = line.split('|').map(p => p.trim());
+
+                if (parts.length >= 2) {
+                    const email = parts[0];
+                    const password = parts[1];
+
+                    if (email && password) {
+                        // ডুপ্লিকেট চেক
+                        const isDuplicate = savedData.some(
+                            item => item.email === email && item.password === password
+                        );
+
+                        if (!isDuplicate) {
+                            savedData.push({ email, password });
+                            addedCount++;
+                        } else {
+                            duplicateCount++;
+                        }
+                    }
+                }
+            });
+
+            if (addedCount === 0 && duplicateCount > 0) {
+                alert(`⚠️ সবগুলো এন্ট্রি আগে থেকেই আছে! (${duplicateCount} টি ডুপ্লিকেট)`);
+                return;
+            }
+
+            if (addedCount === 0) {
+                alert('❌ কোনো বৈধ ডেটা পাওয়া যায়নি!');
+                return;
+            }
+
+            // ইনপুট বক্স ক্লিয়ার
+            document.getElementById('inputData').value = '';
+
+            // সেভ এবং রেন্ডার
+            saveToStorage();
+            renderResults(savedData);
+
+            // সাকসেস মেসেজ
+            let msg = `✅ ${addedCount} টি নতুন এন্ট্রি যোগ হয়েছে`;
+            if (duplicateCount > 0) {
+                msg += ` (${duplicateCount} টি ডুপ্লিকেট বাদ)`;
+            }
+            showToast(msg);
+        }
+
+        // ============ রেন্ডার ============
+        function renderResults(data) {
+            const resultsSection = document.getElementById('results');
+            const resultList = document.getElementById('resultList');
+            const countBadge = document.getElementById('countBadge');
+            const copiedBadge = document.getElementById('copiedBadge');
+
+            if (data.length === 0) {
+                resultList.innerHTML = '<div class="empty-state">📭 কোনো ডেটা নেই</div>';
+                resultsSection.classList.add('active');
+                countBadge.textContent = '০ টি এন্ট্রি';
+                copiedBadge.textContent = '';
+                return;
+            }
+
+            // কপি করা কতগুলো সম্পূর্ণ
+            let fullyCopiedCount = 0;
+
+            resultList.innerHTML = data.map((item, idx) => {
+                const emailId = `email-${idx}`;
+                const passId = `pass-${idx}`;
+                const emailCopied = copiedItems.has(emailId);
+                const passCopied = copiedItems.has(passId);
+                const bothCopied = emailCopied && passCopied;
+
+                if (bothCopied) fullyCopiedCount++;
+
+                return `
+                    <div class="result-card ${bothCopied ? 'fully-copied' : ''}">
+                        <div class="result-header">
+                            <span>#${idx + 1}</span>
+                            <span class="status-badge ${bothCopied ? 'done' : ''}">
+                                ${bothCopied ? '✓ সম্পূর্ণ কপি' : (emailCopied || passCopied ? '◐ আংশিক কপি' : '○ কপি হয়নি')}
+                            </span>
+                        </div>
+                        <div class="result-row">
+                            <span class="label">📧 মেইল:</span>
+                            <div class="value-box ${emailCopied ? 'copied' : ''}" 
+                                 id="${emailId}" 
+                                 onclick="copyText('${escapeHtml(item.email)}', '${emailId}')">
+                                ${escapeHtml(item.email)}
+                                <span class="copy-icon">📋</span>
+                            </div>
+                        </div>
+                        <div class="result-row">
+                            <span class="label">🔑 পাসওয়ার্ড:</span>
+                            <div class="value-box ${passCopied ? 'copied' : ''}" 
+                                 id="${passId}" 
+                                 onclick="copyText('${escapeHtml(item.password)}', '${passId}')">
+                                ${escapeHtml(item.password)}
+                                <span class="copy-icon">📋</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            countBadge.textContent = `📊 মোট: ${data.length} টি`;
+            if (fullyCopiedCount > 0) {
+                copiedBadge.textContent = `✓ কপি হয়েছে: ${fullyCopiedCount} টি`;
+            } else {
+                copiedBadge.textContent = '';
+            }
+
+            resultsSection.classList.add('active');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // ============ কপি ফাংশন ============
+        function copyText(text, elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    markAsCopied(element, elementId);
+                }).catch(() => {
+                    fallbackCopy(text, element, elementId);
+                });
+            } else {
+                fallbackCopy(text, element, elementId);
+            }
+        }
+
+        function fallbackCopy(text, element, elementId) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                markAsCopied(element, elementId);
+            } catch (err) {
+                console.error('কপি ব্যর্থ:', err);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function markAsCopied(element, elementId) {
+            element.classList.add('copied');
+            copiedItems.add(elementId);
+
+            // localStorage এ সেভ
+            saveToStorage();
+
+            // UI আপডেট - স্ট্যাটাস ব্যাজ আপডেট
+            updateCardStatus(elementId);
+
+            showToast('✓ কপি হয়েছে!');
+        }
+
+        // কার্ডের স্ট্যাটাস আপডেট
+        function updateCardStatus(elementId) {
+            // elementId থেকে index বের করা: "email-0" বা "pass-0"
+            const idx = elementId.split('-')[1];
+            const emailId = `email-${idx}`;
+            const passId = `pass-${idx}`;
+
+            const emailCopied = copiedItems.has(emailId);
+            const passCopied = copiedItems.has(passId);
+            const bothCopied = emailCopied && passCopied;
+
+            // কার্ড খুঁজে বের করা
+            const card = document.getElementById(elementId).closest('.result-card');
+            if (!card) return;
+
+            // স্ট্যাটাস ব্যাজ আপডেট
+            const badge = card.querySelector('.status-badge');
+            if (badge) {
+                if (bothCopied) {
+                    badge.textContent = '✓ সম্পূর্ণ কপি';
+                    badge.classList.add('done');
+                    card.classList.add('fully-copied');
+                } else if (emailCopied || passCopied) {
+                    badge.textContent = '◐ আংশিক কপি';
+                    badge.classList.remove('done');
+                    card.classList.remove('fully-copied');
                 } else {
-                    avgSpeedEl.textContent = "0.0";
+                    badge.textContent = '○ কপি হয়নি';
+                    badge.classList.remove('done');
+                    card.classList.remove('fully-copied');
                 }
             }
-            loadSavedStats();
-            updateGauge(0);
 
-            function animateLoop() {
-                const diff = targetSpeed - currentSpeed;
-                if (Math.abs(diff) > 0.01) {
-                    currentSpeed += diff * 0.4;
-                } else {
-                    currentSpeed = targetSpeed;
+            // কাউন্ট ব্যাজ আপডেট
+            updateCopiedCount();
+        }
+
+        function updateCopiedCount() {
+            const copiedBadge = document.getElementById('copiedBadge');
+            let fullyCopiedCount = 0;
+
+            for (let i = 0; i < savedData.length; i++) {
+                if (copiedItems.has(`email-${i}`) && copiedItems.has(`pass-${i}`)) {
+                    fullyCopiedCount++;
                 }
-
-                const displaySpeed = currentSpeed < 0.1 ? 0 : currentSpeed;
-                speedText.textContent = displaySpeed.toFixed(1);
-                updateGauge(displaySpeed);
-
-                requestAnimationFrame(animateLoop);
-            }
-            requestAnimationFrame(animateLoop);
-
-            function calculateDistance(lat1, lon1, lat2, lon2) {
-                const R = 6371000;
-                const dLat = (lat2 - lat1) * Math.PI / 180;
-                const dLon = (lon2 - lon1) * Math.PI / 180;
-                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                          Math.sin(dLon/2) * Math.sin(dLon/2);
-                return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             }
 
-            function handlePosition(pos) {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                const accuracy = pos.coords.accuracy;
-                const now = pos.timestamp;
+            if (fullyCopiedCount > 0) {
+                copiedBadge.textContent = `✓ কপি হয়েছে: ${fullyCopiedCount} টি`;
+            } else {
+                copiedBadge.textContent = '';
+            }
+        }
 
-                gpsDot.classList.add('active');
-                gpsText.textContent = 'GPS ACTIVE';
-
-                if (accuracy > 80) return;
-
-                if (lastLat === null) {
-                    lastLat = lat;
-                    lastLon = lon;
-                    lastTime = now;
-                    return;
-                }
-
-                const distM = calculateDistance(lastLat, lastLon, lat, lon);
-                const timeS = (now - lastTime) / 1000;
-
-                let calculatedSpeed = 0;
-
-                if (pos.coords.speed !== null && pos.coords.speed >= 0) {
-                    calculatedSpeed = pos.coords.speed * 3.6;
-                } else if (timeS > 0) {
-                    calculatedSpeed = (distM / timeS) * 3.6;
-                }
-
-                targetSpeed = calculatedSpeed;
-
-                if (distM >= 0.2) {
-                    tripDistance += (distM / 1000);
-                    localStorage.setItem('ebh_trip_dist', tripDistance);
-                    tripDistEl.textContent = tripDistance.toFixed(2);
-                }
-
-                if (calculatedSpeed > maxSpeed) {
-                    maxSpeed = calculatedSpeed;
-                    localStorage.setItem('ebh_max_speed', maxSpeed);
-                    maxSpeedEl.textContent = maxSpeed.toFixed(1);
-                }
-
-                if (calculatedSpeed > 0.2) {
-                    speedSamples.push(calculatedSpeed);
-                    if (speedSamples.length > 300) speedSamples.shift();
-                    localStorage.setItem('ebh_speed_samples', JSON.stringify(speedSamples));
-                    
-                    const avg = speedSamples.reduce((a, b) => a + b, 0) / speedSamples.length;
-                    avgSpeedEl.textContent = avg.toFixed(1);
-                }
-
-                lastLat = lat;
-                lastLon = lon;
-                lastTime = now;
+        // ============ কপি স্ট্যাটাস রিসেট ============
+        function clearCopyStatus() {
+            if (copiedItems.size === 0) {
+                showToast('ℹ️ কোনো কপি স্ট্যাটাস নেই');
+                return;
             }
 
-            function handleError() {
-                gpsDot.classList.remove('active');
-                gpsText.textContent = 'SEARCHING';
+            if (confirm('সব কপি স্ট্যাটাস রিসেট করতে চান? (মেইল/পাসওয়ার্ড মুছে যাবে না)')) {
+                copiedItems.clear();
+                saveToStorage();
+                renderResults(savedData);
+                showToast('🔄 কপি স্ট্যাটাস রিসেট হয়েছে');
+            }
+        }
+
+        // ============ সব মুছুন ============
+        function clearAll() {
+            if (savedData.length === 0) {
+                showToast('ℹ️ মুছে ফেলার মতো কিছু নেই');
+                return;
             }
 
-            function startAutoTracking() {
-                if (!("geolocation" in navigator)) {
-                    alert("GPS not supported.");
-                    return;
-                }
-
-                gpsText.textContent = "CONNECTING";
-                watchId = navigator.geolocation.watchPosition(
-                    handlePosition,
-                    handleError,
-                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-                );
+            if (confirm(`আপনি কি নিশ্চিত? ${savedData.length} টি এন্ট্রি স্থায়ীভাবে মুছে যাবে!`)) {
+                savedData = [];
+                copiedItems.clear();
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(COPIED_KEY);
+                document.getElementById('inputData').value = '';
+                document.getElementById('results').classList.remove('active');
+                document.getElementById('resultList').innerHTML = '';
+                showToast('🗑️ সব ডেটা মুছে ফেলা হয়েছে');
             }
+        }
 
-            function resetAll() {
-                maxSpeed = 0;
-                tripDistance = 0;
-                speedSamples = [];
-                targetSpeed = 0;
-                currentSpeed = 0;
-                lastLat = null;
-                lastLon = null;
+        // ============ টোস্ট ============
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
 
-                localStorage.removeItem('ebh_max_speed');
-                localStorage.removeItem('ebh_trip_dist');
-                localStorage.removeItem('ebh_speed_samples');
-
-                loadSavedStats();
-                speedText.textContent = "0.0";
-                updateGauge(0);
+        // ============ Ctrl+Enter দিয়ে প্রসেস ============
+        document.getElementById('inputData').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                processData();
             }
+        });
 
-            resetBtn.addEventListener('click', resetAll);
-
-            startAutoTracking();
-
-        })();
+        // ============ পেজ লোড হলে ডেটা লোড ============
+        window.addEventListener('load', () => {
+            loadFromStorage();
+        });
     </script>
 </body>
 </html>
